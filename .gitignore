@@ -1,0 +1,21 @@
+# Laravel
+/vendor
+/node_modules
+/public/storage
+/storage/*.key
+/storage/logs/*
+/bootstrap/cache/*
+
+# Env
+.env
+
+# Build / Zip files
+*.zip
+*.tar
+*.gz
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
