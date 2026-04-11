@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Col, Container, Row, Table } from "react-bootstrap-v5";
+import { Col, Container, Row, Table, Button, Modal } from "react-bootstrap-v5";
 import { connect, useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { useReactToPrint } from "react-to-print";
@@ -16,10 +16,12 @@ import ProductSearchbar from "./product/ProductSearchbar";
 import { prepareCartArray } from "../shared/PrepareCartArray";
 import ProductDetailsModel from "../shared/ProductDetailsModel";
 import CartItemMainCalculation from "./cart-product/CartItemMainCalculation";
+import CartEmptyState from "./cart-product/CartEmptyState";
 import PosHeader from "./header/PosHeader";
 import { posCashPaymentAction } from "../../store/action/pos/posCashPaymentAction";
 import PaymentButton from "./cart-product/PaymentButton";
-import CashPaymentModel from "./cart-product/paymentModel/CashPaymentModel";
+import CashPaymentModel from "./cart-product/paymentModel/CashPaymentModel"; // kept for backward compat
+import InlinePaymentPanel from "./cart-product/InlinePaymentPanel";
 import PrintData from "./printModal/PrintData";
 import PaymentSlipModal from "./paymentSlipModal/PaymentSlipModal";
 import { fetchFrontSetting } from "../../store/action/frontSettingAction";
@@ -153,7 +155,6 @@ const PosMainPage = (props) => {
     }, [subTotal, cartItemValue.discount, cartItemValue.point_discount, cartItemValue.tax, cartItemValue.shipping]);
 
     const { userProfile } = useSelector((state) => state);
-    console.log("userProfile:", selectedCustomerOption);
 
     useEffect(() => {
         setSelectedCustomerOption(
@@ -469,7 +470,7 @@ const PosMainPage = (props) => {
             );
             // setModalShowPaymentSlip(true);
             setCashPayment(false);
-            setPaymentPrint(preparePrintData);
+            setPaymentPrint(preparePrintData());
             setCartItemValue({
                 discount_type: discountType.FIXED,
                 discount_value: 0,
@@ -535,6 +536,7 @@ const PosMainPage = (props) => {
                     paymentType={paymentValue.payment_type.label}
                     allConfigData={allConfigData}
                     updateProducts={paymentPrint}
+                    paymentDetails={paymentDetails}
                 />
             </div>
         );
@@ -597,6 +599,29 @@ const PosMainPage = (props) => {
         setHoldShow(true);
     };
 
+    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+
+    const renderSearchAndButtons = () => (
+        <div className="d-sm-flex align-items-center flex-xxl-nowrap flex-wrap mb-3">
+            <ProductSearchbar
+                customCart={customCart}
+                setUpdateProducts={setUpdateProducts}
+                updateProducts={updateProducts}
+                selectedOption={selectedOption}
+                settings={settings}
+            />
+            <HeaderAllButton
+                holdListData={holdListData}
+                goToHoldScreen={onClickHoldModel}
+                goToDetailScreen={onClickDetailsModel}
+                onClickFullScreen={onClickFullScreen}
+                opneCalculator={openCalculator}
+                setOpneCalculator={setOpenCalculator}
+                handleClickCloseRegister={handleClickCloseRegister}
+            />
+        </div>
+    );
+
     const handleClickCloseRegister = () => {
         dispatch(getAllRegisterDetailsAction());
         setShowCloseDetailsModal(true);
@@ -619,176 +644,203 @@ const PosMainPage = (props) => {
     };
 
     return (
-        <Container className="pos-screen px-3" fluid>
+        <Container className="pos-screen px-3 mt-3" fluid>
             <TabTitle title="POS" />
             {loadPrintBlock()}
             {loadPaymentSlip()}
             {loadRegisterDetailsPrint()}
             <Row>
                 <TopProgressBar />
-                <Col lg={5} xxl={4} xs={6} className="pos-left-scs">
-                    <div className="d-flex flex-column h-100">
-                        <PosHeader
-                            setSelectedCustomerOption={setSelectedCustomerOption}
-                            selectedCustomerOption={selectedCustomerOption}
-                            setSelectedOption={setSelectedOption}
-                            selectedOption={selectedOption}
-                            customerModel={customerModel}
-                            updateCustomer={modalShowCustomer}
-                        />
-                        <div className="left-content custom-card mb-3 p-3 d-flex flex-column justify-content-between">
-                            <div className="main-table overflow-auto">
-                                <Table className="mb-0">
-                                    <thead className="position-sticky top-0">
-                                        <tr>
-                                            <th>
-                                                {getFormattedMessage(
-                                                    "pos-product.title"
-                                                )}
-                                            </th>
-                                            <th
-                                                className={
-                                                    updateProducts &&
-                                                        updateProducts.length
-                                                        ? "text-center"
-                                                        : ""
-                                                }
-                                            >
-                                                {getFormattedMessage(
-                                                    "pos-qty.title"
-                                                )}
-                                            </th>
-                                            <th>
-                                                {getFormattedMessage(
-                                                    "pos-price.title"
-                                                )}
-                                            </th>
-                                            <th colSpan="2">
-                                                {getFormattedMessage(
-                                                    "pos-sub-total.title"
-                                                )}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="border-0">
-                                        {updateProducts && updateProducts.length ? (
-                                            updateProducts.map(
-                                                (updateProduct, index) => {
-                                                    return (
+                <Col lg={12} className="pos-left-scs">
+                    <div className="d-flex flex-column h-100 pb-5">
+                        
+                        {/* Topbar */}
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h1 className="fs-4 fw-bold mb-1 col-12 text-dark">New Sale</h1>
+                                <div className="text-muted-custom small">
+                                    Cashier: {userProfile?.attributes?.first_name || 'Admin'}
+                                </div>
+                            </div>
+                            <div className="d-flex gap-2">
+                                <div className="bg-white border border-line rounded-3 px-3 py-2 d-flex align-items-center gap-2 small text-muted-custom">
+                                    <i className="bi bi-clock"></i> <strong className="text-dark">{moment().format('DD MMM YYYY, hh:mm A')}</strong>
+                                </div>
+                                <button
+                                    className="btn btn-modern btn-ghost d-flex align-items-center gap-2"
+                                    onClick={() => setIsProductModalOpen(true)}
+                                >
+                                    <i className="bi bi-grid" /> 
+                                    Browse Products
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Content Grid */}
+                        <div className="row g-3">
+                                <div className="col-lg-8 d-flex flex-column gap-3">
+                                    
+                                    {/* Add Item / Search */}
+                                    <div className="card-modern p-4">
+                                        <div className="card-title-modern mb-3 d-flex justify-content-between align-items-center">
+                                            <span>Add Item</span>
+                                            <div style={{width:'auto'}}><PosHeader
+                                                setSelectedCustomerOption={setSelectedCustomerOption}
+                                                selectedCustomerOption={selectedCustomerOption}
+                                                setSelectedOption={setSelectedOption}
+                                                selectedOption={selectedOption}
+                                                customerModel={customerModel}
+                                                updateCustomer={modalShowCustomer}
+                                            /></div>
+                                        </div>
+                                        <div className="w-100">
+                                             {renderSearchAndButtons()}
+                                        </div>
+                                    </div>
+
+                                    {/* Cart Items */}
+                                    <div className="card-modern p-4">
+                                        <div className="card-title-modern mb-3">Cart Items</div>
+                                        <Table className="table table-modern table-borderless mb-0 w-100">
+                                            <thead className="position-sticky top-0">
+                                                <tr>
+                                                    <th className="py-3 text-start">#</th>
+                                                    <th className="py-3 text-start">{getFormattedMessage("pos-product.title")}</th>
+                                                    <th className="py-3 text-start">{getFormattedMessage("pos-qty.title")}</th>
+                                                    <th className="py-3 text-start">{getFormattedMessage("pos-price.title")}</th>
+                                                    <th className="py-3 text-end" colSpan="2">{getFormattedMessage("pos-sub-total.title")}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="border-0">
+                                                {updateProducts && updateProducts.length ? (
+                                                    updateProducts.map((updateProduct, index) => (
                                                         <ProductCartList
-                                                            singleProduct={
-                                                                updateProduct
-                                                            }
+                                                            singleProduct={updateProduct}
                                                             key={index + 1}
                                                             index={index}
-                                                            posAllProducts={
-                                                                posAllProducts
-                                                            }
-                                                            onClickUpdateItemInCart={
-                                                                onClickUpdateItemInCart
-                                                            }
+                                                            posAllProducts={posAllProducts}
+                                                            onClickUpdateItemInCart={onClickUpdateItemInCart}
                                                             updatedQty={updatedQty}
                                                             updateCost={updateCost}
-                                                            onDeleteCartItem={
-                                                                onDeleteCartItem
-                                                            }
+                                                            onDeleteCartItem={onDeleteCartItem}
                                                             quantity={quantity}
-                                                            frontSetting={
-                                                                frontSetting
-                                                            }
+                                                            frontSetting={frontSetting}
                                                             newCost={newCost}
-                                                            allConfigData={
-                                                                allConfigData
-                                                            }
-                                                            setUpdateProducts={
-                                                                setUpdateProducts
-                                                            }
+                                                            allConfigData={allConfigData}
+                                                            setUpdateProducts={setUpdateProducts}
+                                                            settings={settings}
                                                         />
-                                                    );
-                                                }
-                                            )
-                                        ) : (
-                                            <tr>
-                                                <td
-                                                    colSpan={4}
-                                                    className="custom-text-center text-gray-900 fw-bold py-5"
-                                                >
-                                                    {getFormattedMessage(
-                                                        "sale.product.table.no-data.label"
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </Table>
-                            </div>
-                            <div>
-                                <CartItemMainCalculation
-                                    totalQty={totalQty}
-                                    subTotal={subTotal}
-                                    grandTotal={grandTotal}
-                                    cartItemValue={cartItemValue}
-                                    onChangeCart={onChangeCart}
-                                    allConfigData={allConfigData}
-                                    frontSetting={frontSetting}
-                                    onChangeTaxCart={onChangeTaxCart}
-                                    customer={customers && customers.find(c => c.id === (selectedCustomerOption && (selectedCustomerOption.value || (selectedCustomerOption[0] && selectedCustomerOption[0].value))))}
-                                />
-                                <PaymentButton
-                                    updateProducts={updateProducts}
-                                    updateCart={addToCarts}
-                                    setUpdateProducts={setUpdateProducts}
-                                    setCartItemValue={setCartItemValue}
-                                    setCashPayment={setCashPayment}
-                                    cartItemValue={cartItemValue}
-                                    grandTotal={grandTotal}
-                                    subTotal={subTotal}
-                                    selectedOption={selectedOption}
-                                    cashPaymentValue={cashPaymentValue}
-                                    holdListId={holdListId}
-                                    setHoldListValue={setHoldListValue}
-                                    setUpdateHoldList={setUpdateHoldList}
-                                />
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan={6} className="text-center py-5 border-0">
+                                                            <div className="fs-1 mb-2">🛍️</div>
+                                                            <div className="text-muted-custom">No items added yet</div>
+                                                            <small className="text-muted-custom">Scan a barcode or search above to begin</small>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </Table>
+                                    </div>
+                                </div>
+
+                                {/* Right form: Summary & Payment */}
+                                <div className="col-lg-4">
+                                    <div className="card-modern p-4">
+                                        <div className="card-title-modern mb-3">Order Summary</div>
+                                        
+                                        <CartItemMainCalculation
+                                            totalQty={totalQty}
+                                            subTotal={subTotal}
+                                            grandTotal={grandTotal}
+                                            cartItemValue={cartItemValue}
+                                            onChangeCart={onChangeCart}
+                                            allConfigData={allConfigData}
+                                            frontSetting={frontSetting}
+                                            onChangeTaxCart={onChangeTaxCart}
+                                            customer={customers && customers.find(c => c.id === (selectedCustomerOption && (selectedCustomerOption.value || (selectedCustomerOption[0] && selectedCustomerOption[0].value))))}
+                                        />
+
+                                        <div className="my-2">
+                                            <PaymentButton
+                                                updateProducts={updateProducts}
+                                                updateCart={addToCarts}
+                                                setUpdateProducts={setUpdateProducts}
+                                                setCartItemValue={setCartItemValue}
+                                                setCashPayment={setCashPayment}
+                                                cartItemValue={cartItemValue}
+                                                grandTotal={grandTotal}
+                                                subTotal={subTotal}
+                                                selectedOption={selectedOption}
+                                                cashPaymentValue={cashPaymentValue}
+                                                holdListId={holdListId}
+                                                setHoldListValue={setHoldListValue}
+                                                setUpdateHoldList={setUpdateHoldList}
+                                            />
+                                        </div>
+
+                                        <InlinePaymentPanel
+                                            grandTotal={grandTotal}
+                                            totalQty={totalQty}
+                                            subTotal={subTotal}
+                                            taxTotal={taxTotal}
+                                            cartItemValue={cartItemValue}
+                                            settings={settings}
+                                            allConfigData={allConfigData}
+                                            frontSetting={frontSetting}
+                                            cashPaymentValue={cashPaymentValue}
+                                            onChangeInput={onChangeInput}
+                                            onPaymentStatusChange={onPaymentStatusChange}
+                                            onPaymentTypeChange={onPaymentTypeChange}
+                                            onCashPayment={onCashPayment}
+                                            onChangeReturnChange={onChangeReturnChange}
+                                            errors={errors}
+                                            paymentTypeDefaultValue={paymentTypeDefaultValue}
+                                            paymentTypeFilterOptions={paymentTypeFilterOptions}
+                                            updateProducts={updateProducts}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </Col>
-                <Col lg={7} xxl={8} xs={6} className="ps-lg-0 pos-right-scs">
-                    <div className="right-content mb-3 d-flex flex-column h-100">
-                        <div className="d-sm-flex align-items-center flex-xxl-nowrap flex-wrap">
-                            <ProductSearchbar
-                                customCart={customCart}
-                                setUpdateProducts={setUpdateProducts}
-                                updateProducts={updateProducts}
+            </Row>
+
+            {/* PRODUCT BROWSER MODAL */}
+            <Modal show={isProductModalOpen} onHide={() => setIsProductModalOpen(false)} size="xl" scrollable>
+                <Modal.Header closeButton className="border-bottom-0 bg-light py-3">
+                    <Modal.Title className="fs-5 fw-bold text-dark w-100 pe-4">
+                        <div className="d-flex align-items-center gap-2">
+                            <i className="bi bi-grid-fill text-primary" /> Browse Products
+                        </div>
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="bg-light p-4 pt-0">
+                    <div className="card-modern p-3 mb-4 sticky-top z-index-1">
+                        <ProductSearchbar
+                            customCart={customCart}
+                            setUpdateProducts={setUpdateProducts}
+                            updateProducts={updateProducts}
+                            selectedOption={selectedOption}
+                            settings={settings}
+                        />
+                    </div>
+                    
+                    <div className="card-modern h-100">
+                        <div className="p-4 border-bottom border-line pb-2">
+                            <Category
+                                setCategory={setCategory}
+                                brandId={brandId}
                                 selectedOption={selectedOption}
-                            // handleOnSelect={handleOnSelect} handleOnSearch={handleOnSearch}
-                            // searchString={searchString}
                             />
-                            <HeaderAllButton
-                                holdListData={holdListData}
-                                goToHoldScreen={onClickHoldModel}
-                                goToDetailScreen={onClickDetailsModel}
-                                onClickFullScreen={onClickFullScreen}
-                                opneCalculator={openCalculator}
-                                setOpneCalculator={setOpenCalculator}
-                                handleClickCloseRegister={
-                                    handleClickCloseRegister
-                                }
+                            <Brands
+                                categoryId={categoryId}
+                                setBrand={setBrand}
+                                selectedOption={selectedOption}
                             />
                         </div>
-                        <div className="custom-card h-100 mb-3">
-                            <div className="p-3">
-                                <Category
-                                    setCategory={setCategory}
-                                    brandId={brandId}
-                                    selectedOption={selectedOption}
-                                />
-                                <Brands
-                                    categoryId={categoryId}
-                                    setBrand={setBrand}
-                                    selectedOption={selectedOption}
-                                />
-                            </div>
+                        <div className="p-3">
                             <Product
                                 cartProducts={updateProducts}
                                 updateCart={addToCarts}
@@ -801,8 +853,8 @@ const PosMainPage = (props) => {
                             />
                         </div>
                     </div>
-                </Col>
-            </Row>
+                </Modal.Body>
+            </Modal>
             {isOpenCartItemUpdateModel && (
                 <ProductDetailsModel
                     openProductDetailModal={openProductDetailModal}
@@ -814,29 +866,7 @@ const PosMainPage = (props) => {
                     frontSetting={frontSetting}
                 />
             )}
-            {cashPayment && (
-                <CashPaymentModel
-                    cashPayment={cashPayment}
-                    totalQty={totalQty}
-                    cartItemValue={cartItemValue}
-                    onChangeInput={onChangeInput}
-                    onPaymentStatusChange={onPaymentStatusChange}
-                    cashPaymentValue={cashPaymentValue}
-                    allConfigData={allConfigData}
-                    subTotal={subTotal}
-                    onPaymentTypeChange={onPaymentTypeChange}
-                    grandTotal={grandTotal}
-                    onCashPayment={onCashPayment}
-                    taxTotal={taxTotal}
-                    handleCashPayment={handleCashPayment}
-                    settings={settings}
-                    errors={errors}
-                    paymentTypeDefaultValue={paymentTypeDefaultValue}
-                    paymentTypeFilterOptions={paymentTypeFilterOptions}
-                    onChangeReturnChange={onChangeReturnChange}
-                    setPaymentValue={setPaymentValue}
-                />
-            )}
+            {/* CashPaymentModel removed — payment is now inline via InlinePaymentPanel */}
             {lgShow && (
                 <RegisterDetailsModel
                     printRegisterDetails={printRegisterDetails}

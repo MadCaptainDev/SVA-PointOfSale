@@ -17,6 +17,7 @@ class PrintData extends React.PureComponent {
     const paymentPrint = this.props.updateProducts;
     const allConfigData = this.props.allConfigData;
     const paymentType = this.props.paymentType;
+    const paymentDetails = this.props.paymentDetails;
     const currency =
       paymentPrint.settings &&
       paymentPrint.settings.attributes &&
@@ -42,6 +43,11 @@ class PrintData extends React.PureComponent {
     const totalTaxValue = (Number(paymentPrint.taxTotal) || 0) + inclusiveTaxTotal;
     const cgst = (totalTaxValue / 2).toFixed(2);
     const sgst = (totalTaxValue / 2).toFixed(2);
+
+    // Bill number: prefer API response (paymentDetails), fallback to paymentPrint
+    const billNumber = (paymentDetails && paymentDetails.attributes && paymentDetails.attributes.reference_code)
+      || paymentPrint.reference_code
+      || '';
 
     console.log('Print data :', paymentPrint);
 
@@ -81,7 +87,7 @@ class PrintData extends React.PureComponent {
 
           <div>
             <span className="label">Bill No:</span>
-            <span> {paymentPrint.reference_code}</span>
+            <span> {billNumber}</span>
           </div>
           <div>
             <span className="label">Cell:</span>

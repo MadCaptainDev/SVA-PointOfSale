@@ -5,17 +5,16 @@
 
     > thead {
         > tr > th {
-            padding: 0.75rem 0.25rem 0.75rem 1.875rem;
+            padding: 0.75rem 0.25rem 0.75rem 1.5rem;
         }
-
         > tr > th:last-child {
             padding-left: 0;
-            padding-right: 1.875rem;
+            padding-right: 1.5rem;
         }
     }
 
     > :not(caption) > * > * {
-        padding: 0.938rem 0.25rem 0.938rem 1.875rem;
+        padding: 0.875rem 0.25rem 0.875rem 1.5rem;
         vertical-align: middle;
         font-weight: 400;
     }
@@ -24,12 +23,12 @@
         background-color: $body-bg;
 
         tr {
-             td {
-                 &:last-child {
-                     padding-left: 0;
-                     padding-right: 1.875rem;
-                 }
-             }
+            td {
+                &:last-child {
+                    padding-left: 0;
+                    padding-right: 1.5rem;
+                }
+            }
         }
     }
 }
@@ -38,9 +37,13 @@
     > thead {
         > tr > th {
             text-transform: uppercase;
-            font-weight: 400;
-            background-color: $gray-100;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            color: #8b90a3;
+            background-color: #fafbfc;
             white-space: nowrap;
+            border-bottom: 1px solid #eef0f5;
         }
     }
 }

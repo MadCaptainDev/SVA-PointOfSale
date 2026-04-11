@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wonder POS — Sales (Bootstrap)</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<style>
+  :root {
+    --bs-body-bg: #f5f6fa;
+    --bs-body-color: #1a1d29;
+    --bs-body-font-family: 'Inter', sans-serif;
+    --brand-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+  }
+  body {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    font-size: 0.875rem; /* 14px */
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    background-color: #fff;
+    width: 240px;
+    height: 100vh;
+    border-right: 1px solid #eef0f5;
+    position: sticky;
+    top: 0;
+  }
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--brand-gradient);
+    font-weight: 800;
+  }
+  .nav-item-custom {
+    border-radius: 10px;
+    color: #8b90a3;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .nav-item-custom:hover {
+    background-color: #f5f6fa;
+    color: #1a1d29;
+  }
+  .nav-item-custom.active {
+    background: var(--brand-gradient);
+    color: #fff;
+  }
+
+  /* Cards & Forms */
+  .card-modern {
+    background: #fff;
+    border: 1px solid #eef0f5;
+    border-radius: 16px;
+  }
+  .card-title-modern {
+    font-size: 13px;
+    font-weight: 600;
+    color: #8b90a3;
+    letter-spacing: 0.5px;
+  }
+  .form-label {
+    font-size: 12px;
+    color: #8b90a3;
+    font-weight: 500;
+  }
+  .form-control, .form-select {
+    border: 1px solid #eef0f5;
+    border-radius: 10px;
+    background-color: #fafbfc;
+    font-size: 14px;
+    padding: 0.625rem 0.875rem;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 0.2rem rgba(99,102,241,0.1);
+    background-color: #fff;
+  }
+
+  /* Table */
+  .table-modern thead th {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: #8b90a3;
+    font-weight: 600;
+    border-bottom: 1px solid #eef0f5;
+  }
+  .table-modern tbody td {
+    color: #8b90a3;
+    border-bottom: none;
+  }
+  
+  /* Buttons & Utilities */
+  .bg-gradient-brand {
+    background: var(--brand-gradient);
+    color: #fff;
+  }
+  .btn-modern {
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 0.6875rem 1.125rem;
+  }
+  .btn-ghost {
+    background: #fff;
+    border: 1px solid #eef0f5;
+    color: #1a1d29;
+  }
+  .btn-ghost:hover {
+    background: #f5f6fa;
+  }
+  .text-muted-custom {
+    color: #8b90a3;
+  }
+  .border-line {
+    border-color: #eef0f5 !important;
+  }
+</style>
+</head>
+<body>
+<div class="d-flex">
+  <!-- Sidebar -->
+  <div class="sidebar p-3 d-none d-lg-block flex-shrink-0">
+    <div class="d-flex align-items-center gap-2 px-2 pb-4 fw-bold fs-5 text-dark">
+      <div class="logo-mark d-flex align-items-center justify-content-center text-white">W</div>
+      Wonder POS
+    </div>
+    <div class="d-flex flex-column gap-1">
+      <a href="#" class="nav-item-custom active text-decoration-none d-flex align-items-center gap-3 px-3 py-2">
+        <i class="bi bi-cart3 fs-6"></i> Sales
+      </a>
+      <a href="#" class="nav-item-custom text-decoration-none d-flex align-items-center gap-3 px-3 py-2">
+        <i class="bi bi-box-seam fs-6"></i> Purchase
+      </a>
+      <a href="#" class="nav-item-custom text-decoration-none d-flex align-items-center gap-3 px-3 py-2">
+        <i class="bi bi-tags fs-6"></i> Items
+      </a>
+      <a href="#" class="nav-item-custom text-decoration-none d-flex align-items-center gap-3 px-3 py-2">
+        <i class="bi bi-bar-chart fs-6"></i> Stock
+      </a>
+      <a href="#" class="nav-item-custom text-decoration-none d-flex align-items-center gap-3 px-3 py-2">
+        <i class="bi bi-people fs-6"></i> Customers
+      </a>
+      <a href="#" class="nav-item-custom text-decoration-none d-flex align-items-center gap-3 px-3 py-2">
+        <i class="bi bi-truck fs-6"></i> Suppliers
+      </a>
+      <a href="#" class="nav-item-custom text-decoration-none d-flex align-items-center gap-3 px-3 py-2">
+        <i class="bi bi-briefcase fs-6"></i> Accounts
+      </a>
+      <a href="#" class="nav-item-custom text-decoration-none d-flex align-items-center gap-3 px-3 py-2">
+        <i class="bi bi-graph-up fs-6"></i> Reports
+      </a>
+      <a href="#" class="nav-item-custom text-decoration-none d-flex align-items-center gap-3 px-3 py-2">
+        <i class="bi bi-gear fs-6"></i> Settings
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-grow-1 p-4 w-100 overflow-auto h-100 position-absolute" style="left: 240px; width: calc(100% - 240px) !important;">
+    
+    <!-- Topbar -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="fs-4 fw-bold mb-1 col-12 text-dark">New Sale</h1>
+        <div class="text-muted-custom small">Bill #-- &nbsp;&bull;&nbsp; Counter-4 &nbsp;&bull;&nbsp; Cashier: admin</div>
+      </div>
+      <div class="d-flex gap-2">
+        <div class="bg-white border border-line rounded-3 px-3 py-2 d-flex align-items-center gap-2 small text-muted-custom">
+          <i class="bi bi-geo-alt"></i> <strong class="text-dark">Server Room</strong>
+        </div>
+        <div class="bg-white border border-line rounded-3 px-3 py-2 d-flex align-items-center gap-2 small text-muted-custom">
+          <i class="bi bi-clock"></i> <strong class="text-dark">05 Apr 2026, 4:54 PM</strong>
+        </div>
+        <button class="btn btn-modern btn-ghost d-flex align-items-center gap-2">
+          <i class="bi bi-x-lg text-danger"></i> Close
+        </button>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="row g-3">
+      <!-- Left Column -->
+      <div class="col-lg-8 d-flex flex-column gap-3">
+        
+        <!-- Add Item -->
+        <div class="card-modern p-4">
+          <div class="card-title-modern text-uppercase mb-3">Add Item</div>
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Item Code</label>
+              <input class="form-control" placeholder="Scan or type...">
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">Description</label>
+              <input class="form-control" placeholder="Item name">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Rate</label>
+              <input class="form-control" placeholder="0.00">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Qty</label>
+              <input class="form-control" placeholder="1">
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Items -->
+        <div class="card-modern p-4">
+          <div class="card-title-modern text-uppercase mb-3">Cart Items</div>
+          <table class="table table-modern table-borderless mb-0 w-100">
+            <thead>
+              <tr>
+                <th class="py-3 text-start">#</th>
+                <th class="py-3 text-start">Item Code</th>
+                <th class="py-3 text-start">Description</th>
+                <th class="py-3 text-start">Qty</th>
+                <th class="py-3 text-start">MRP</th>
+                <th class="py-3 text-start">Price</th>
+                <th class="py-3 text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="7" class="text-center py-5">
+                  <div class="fs-1 mb-2">🛍️</div>
+                  <div class="text-muted-custom">No items added yet</div>
+                  <small class="text-muted-custom">Scan a barcode or search above to begin</small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Customer -->
+        <div class="card-modern p-4">
+          <div class="card-title-modern text-uppercase mb-3">Customer</div>
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Customer ID</label>
+              <input class="form-control" value="—" readonly>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Card No</label>
+              <input class="form-control">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Mobile</label>
+              <input class="form-control" placeholder="+91">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Name</label>
+              <input class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="row g-2 mt-1">
+          <div class="col-3">
+             <button class="btn btn-modern btn-ghost w-100 d-flex align-items-center justify-content-center gap-2">
+               <i class="bi bi-folder2-open text-primary"></i> Load Draft
+             </button>
+          </div>
+          <div class="col-3">
+             <button class="btn btn-modern btn-ghost w-100 d-flex align-items-center justify-content-center gap-2">
+               <i class="bi bi-floppy text-success"></i> Save Draft
+             </button>
+          </div>
+          <div class="col-3">
+             <button class="btn btn-modern btn-ghost w-100 d-flex align-items-center justify-content-center gap-2">
+               <i class="bi bi-pause-circle text-warning"></i> Hold
+             </button>
+          </div>
+          <div class="col-3">
+             <button class="btn btn-modern btn-ghost w-100 d-flex align-items-center justify-content-center gap-2">
+               <i class="bi bi-arrow-counterclockwise text-danger"></i> Clear
+             </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column -->
+      <div class="col-lg-4">
+        <div class="card-modern p-4">
+          <div class="card-title-modern text-uppercase mb-3">Order Summary</div>
+          
+          <div class="d-flex justify-content-between py-2 text-muted-custom">
+            <span>Total Items</span><strong class="text-dark">0</strong>
+          </div>
+          <div class="d-flex justify-content-between py-2 text-muted-custom">
+            <span>Total Qty</span><strong class="text-dark">0</strong>
+          </div>
+          <div class="d-flex justify-content-between py-2 text-muted-custom">
+            <span>Sub Total</span><strong class="text-dark">₹0.00</strong>
+          </div>
+          
+          <hr class="border-line my-2">
+          
+          <div class="d-flex justify-content-between py-2 text-muted-custom">
+            <span>Discount</span><strong class="text-dark">—</strong>
+          </div>
+          <div class="d-flex justify-content-between py-2 text-muted-custom">
+            <span>Tax</span><strong class="text-dark">₹0.00</strong>
+          </div>
+          <div class="d-flex justify-content-between py-2 text-muted-custom">
+            <span>Other Charges</span><strong class="text-dark">₹0.00</strong>
+          </div>
+          <div class="d-flex justify-content-between py-2 text-muted-custom">
+            <span>Round Off</span><strong class="text-dark">₹0.00</strong>
+          </div>
+          
+          <hr class="border-line my-2">
+          
+          <label class="form-label mt-2">Payment Mode</label>
+          <select class="form-select mb-3">
+            <option>💵 Cash</option>
+            <option>💳 Card</option>
+            <option>📱 UPI</option>
+          </select>
+
+          <!-- Total Card -->
+          <div class="bg-gradient-brand rounded-4 p-4 mt-2">
+            <div class="text-uppercase small fw-semibold text-white-50 letter-spacing-1">Net Payable</div>
+            <div class="fs-1 fw-bold mb-3">₹0.00</div>
+            
+            <div class="d-flex gap-2">
+              <div class="bg-white bg-opacity-10 rounded-3 p-2 flex-grow-1">
+                <div class="small text-white-50">Tender</div>
+                <div class="fs-6 fw-semibold">₹0.00</div>
+              </div>
+              <div class="bg-white bg-opacity-10 rounded-3 p-2 flex-grow-1">
+                <div class="small text-white-50">Return</div>
+                <div class="fs-6 fw-semibold">₹0.00</div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-modern btn-success w-100 mt-4 py-3 fs-6 d-flex align-items-center justify-content-center gap-2 rounded-3">
+            <i class="bi bi-check2"></i> Complete Sale
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

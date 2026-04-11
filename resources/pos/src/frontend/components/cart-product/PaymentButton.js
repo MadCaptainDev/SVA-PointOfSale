@@ -101,7 +101,7 @@ const PaymentButton = (props) => {
     const resetPaymentModel = () => {
         if (
             updateProducts.length > 0 ||
-            qtyCart.length < 0 ||
+            qtyCart.length > 0 ||
             cartItemValue.tax > 100 ||
             Number(cartItemValue.discount) > grandTotal ||
             Number(cartItemValue.shipping) > Number(subTotal)
@@ -113,7 +113,7 @@ const PaymentButton = (props) => {
     const holdPaymentModel = () => {
         if (
             updateProducts.length > 0 ||
-            qtyCart.length < 0 ||
+            qtyCart.length > 0 ||
             cartItemValue.tax > 100 ||
             Number(cartItemValue.discount) > grandTotal ||
             Number(cartItemValue.shipping) > Number(subTotal)
@@ -250,15 +250,7 @@ const PaymentButton = (props) => {
                     className="ms-2 fa"
                 />
             </Button>
-            <Button
-                type="button"
-                variant="success"
-                className="text-white w-100 py-3 rounded-10 px-3 pos-pay-btn"
-                onClick={openPaymentModel}
-            >
-                {getFormattedMessage("pos-pay-now.btn")}
-                <i className="ms-2 fa fa-money-bill" />
-            </Button>
+            {/* Pay Now button replaced by InlinePaymentPanel — always visible */}
             {/*<Button type='button' className='text-white me-xl-3 me-2 mb-2 custom-btn-size'>*/}
             {/*    Debit<i className='ms-2 fa fa-credit-card text-white'/></Button>*/}
             {/*<Button type='button' variant='secondary' className='me-xl-0 me-2 mb-2 custom-btn-size'>*/}

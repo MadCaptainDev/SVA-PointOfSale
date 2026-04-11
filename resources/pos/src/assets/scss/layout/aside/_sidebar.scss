@@ -3,6 +3,8 @@
 
 .aside-menu-container {
     @include fixed-menu;
+    background-color: $white;
+    border-right: 1px solid #eef0f5;
 
     @media (max-width: 1199px) {
         position: fixed;
@@ -17,25 +19,46 @@
         justify-content: space-between;
         align-items: center;
         height: 70px;
-        padding: 0 1.563rem;
-        border-bottom: 0.063rem solid $gray-200;
+        padding: 0 1.25rem;
+        border-bottom: none;
+
+        // Logo mark styling
+        .sidebar-logo {
+            font-weight: 800;
+            font-size: 1.125rem;
+            color: $black;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+        }
     }
 
     &__aside-menubar {
-        color: $gray-600;
+        color: $gray;
     }
 
     &__aside-search {
-        padding: 0 1.563rem;
+        padding: 0 1rem;
+        margin-bottom: 0.5rem;
 
         .form-control {
-            padding-left: 1.875rem;
-            height: 40px;
+            padding-left: 2rem;
+            height: 38px;
+            border-radius: 0.625rem;
+            border: 1px solid #eef0f5;
+            background-color: #fafbfc;
+            font-size: 0.8125rem;
+
+            &:focus {
+                border-color: $cyan;
+                box-shadow: 0 0 0 0.15rem rgba(99, 102, 241, 0.08);
+                background-color: $white;
+            }
         }
     }
 
     &__search-icon {
-        color: $gray-600;
+        color: $gray;
         left: 10px;
     }
 
@@ -43,12 +66,26 @@
         height: calc(100% - 138px);
         overflow-y: auto;
         overflow-x: hidden;
+
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: #dfe1e8;
+            border-radius: 4px;
+        }
     }
 
     &__aside-menu {
+        padding: 0.25rem 0.75rem;
+
         .nav-item {
-            transition: color 0.2s ease, background-color 0.2s ease;
+            transition: all 0.2s ease;
             cursor: pointer;
+            margin-bottom: 2px;
 
             &.collapse-submenu {
                 .aside-menu-collapse-icon {
@@ -57,34 +94,52 @@
             }
 
             .nav-link {
-                border-left: 0.313rem solid transparent;
-                color: $gray-600;
-                padding-left: 1.25rem;
-                padding-right: 1.563rem;
+                border-left: none;
+                color: $gray;
+                padding: 0.5rem 0.75rem;
+                border-radius: 0.625rem;
+                font-weight: 500;
+                font-size: 0.875rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+
+                .aside-menu-icon {
+                    font-size: 1.05rem;
+                    width: 20px;
+                    text-align: center;
+                }
 
                 .aside-menu-title {
                     white-space: nowrap;
                 }
 
                 &:hover {
-                    background: $cyan-100;
-                    border-left-color: $cyan;
-                    color: $gray-900;
+                    background-color: #f5f6fa;
+                    border-left-color: transparent;
+                    color: $black;
                 }
             }
 
             &.active {
                 > .nav-link {
-                    background: $cyan-100;
-                    border-left-color: $cyan;
-                    color: $gray-900;
+                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                    border-left-color: transparent;
+                    color: $white;
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+
+                    .aside-menu-icon,
+                    svg {
+                        color: $white !important;
+                    }
                 }
             }
 
             ul.aside-submenu {
                 .nav-item {
                     .nav-link {
-                        padding-left: 40px;
+                        padding-left: 2.5rem;
+                        font-size: 0.8125rem;
                     }
                 }
             }
@@ -107,6 +162,7 @@
                     padding-left: 1.625rem;
                     width: 80px;
                     min-width: 80px;
+                    justify-content: center;
                 }
 
                 .aside-menu-title, .aside-menu-collapse-icon {
@@ -159,7 +215,7 @@
 
     .horizontal-sidebar-logo {
         @media (min-width: 1200px) {
-            border-right: 1px solid $gray-300;
+            border-right: 1px solid #eef0f5;
         }
     }
 
@@ -175,6 +231,9 @@
             .nav-link {
                 padding-left: 0.938rem;
                 padding-right: 0.938rem;
+                color: $gray;
+                font-weight: 500;
+                transition: all 0.2s ease;
 
                 @media (max-width: 1399px) and (min-width: 1200px) {
                     padding-left: 0.75rem;
@@ -182,10 +241,10 @@
                 }
 
                 &:hover {
-                    color: $primary;
+                    color: $cyan;
 
                     .horizontal-menu-title {
-                        color: $gray-900;
+                        color: $black;
                     }
                 }
 
@@ -195,10 +254,10 @@
             }
 
             &.active .nav-link {
-                color: $primary;
+                color: $cyan;
 
                 .horizontal-menu-title {
-                    color: $gray-900;
+                    color: $black;
                 }
             }
 

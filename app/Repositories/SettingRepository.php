@@ -70,18 +70,28 @@ class SettingRepository extends BaseRepository
                 'smtp_Encryption', 'address', 'show_version_on_footer', 'country', 'state', 'city', 'postcode',
                 'date_format', 'purchase_code', 'purchase_return_code', 'sale_code', 'sale_return_code', 'expense_code',
                 'is_currency_right', 'show_logo_in_receipt', 'show_app_name_in_sidebar',
-                'point_earning_rate', 'point_redemption_rate',
+                'point_earning_rate', 'point_redemption_rate', 'show_stock_warning',
             ]);
 
             foreach ($settingInputArray as $key => $value) {
-                if ($key == 'show_version_on_footer' || $key == 'is_currency_right' || $key == 'show_logo_in_receipt' || $key == 'show_app_name_in_sidebar') {
+                if ($key == 'show_version_on_footer' || $key == 'is_currency_right' || $key == 'show_logo_in_receipt' || $key == 'show_app_name_in_sidebar' || $key == 'show_stock_warning') {
                     if (empty($value)) {
-                        Setting::where('key', '=', $key)->first()->update(['value' => false]);
+                        $setting = Setting::where('key', '=', $key)->first();
+                        if ($setting) {
+                            $setting->update(['value' => false]);
+                        } else {
+                            Setting::create(['key' => $key, 'value' => false]);
+                        }
                     }
                 }
 
                 if (isset($value) && !empty($value)) {
-                    Setting::where('key', '=', $key)->first()->update(['value' => $value]);
+                    $setting = Setting::where('key', '=', $key)->first();
+                    if ($setting) {
+                        $setting->update(['value' => $value]);
+                    } else {
+                        Setting::create(['key' => $key, 'value' => $value]);
+                    }
                 }
             }
             $input['logo'] = Setting::where('key', '=', 'logo')->first()->logo;

@@ -81,6 +81,7 @@ const Settings = (props) => {
         Currency_icon_Right_side: "",
         point_earning_rate: "",
         point_redemption_rate: "",
+        show_stock_warning: "",
     });
 
     const [defaultDate, setDefaultDate] = useState(null);
@@ -127,6 +128,7 @@ const Settings = (props) => {
     const [checked, setChecked] = useState(false);
     const [logoChecked, setLogoChecked] = useState(false);
     const [showAppName, setShowAppName] = useState(false);
+    const [showStockWarning, setShowStockWarning] = useState(false);
 
     const newLanguages = languages.filter((language) => language.value);
     // const currencies = useSelector((state) => state.currencies)
@@ -338,6 +340,11 @@ const Settings = (props) => {
                     settings.attributes && settings.attributes.point_redemption_rate
                         ? settings.attributes.point_redemption_rate
                         : "",
+                show_stock_warning:
+                    settings.attributes &&
+                        settings.attributes.show_stock_warning !== "1"
+                        ? false
+                        : true,
             });
             if (
                 settings.attributes &&
@@ -363,6 +370,15 @@ const Settings = (props) => {
                 setShowAppName(true);
             } else {
                 setShowAppName(false);
+            }
+
+            if (
+                settings.attributes &&
+                settings.attributes.show_stock_warning === "1"
+            ) {
+                setShowStockWarning(true);
+            } else {
+                setShowStockWarning(false);
             }
         }
     }, [settings, defaultDate]);
@@ -507,6 +523,12 @@ const Settings = (props) => {
                 ...settingValue,
                 show_app_name_in_sidebar: checked,
             }));
+        } else if (checkboxType === "stockwarning") {
+            setShowStockWarning(checked);
+            setSettingValue((settingValue) => ({
+                ...settingValue,
+                show_stock_warning: checked,
+            }));
         }
     };
 
@@ -595,6 +617,10 @@ const Settings = (props) => {
         formData.append("is_currency_right", data.Currency_icon_Right_side);
         formData.append("point_earning_rate", data.point_earning_rate);
         formData.append("point_redemption_rate", data.point_redemption_rate);
+        formData.append(
+            "show_stock_warning",
+            data.show_stock_warning === true ? "1" : "0"
+        );
         return formData;
     };
 
@@ -1262,6 +1288,29 @@ const Settings = (props) => {
                                             {getFormattedMessage(
                                                 "settings.system-settings.select.appname-sidebar.placeholder.label"
                                             )}
+                                        </label>
+                                    </div>
+                                </div>
+
+                                {/* Show Stock Warning toggle */}
+                                <div className="col-lg-6 mb-3">
+                                    <div className="col-md-6">
+                                        <label className="form-check form-check-custom form-check-solid form-check-inline d-flex align-items-center my-3 cursor-pointer custom-label">
+                                            <input
+                                                type="checkbox"
+                                                name="show_stock_warning"
+                                                value={showStockWarning}
+                                                checked={showStockWarning}
+                                                onChange={(event) =>
+                                                    handleChanged(
+                                                        event,
+                                                        "stockwarning"
+                                                    )
+                                                }
+                                                className="me-3 form-check-input cursor-pointer"
+                                            />
+                                            <div className="control__indicator" />{" "}
+                                            Show Stock Warning in POS
                                         </label>
                                     </div>
                                 </div>

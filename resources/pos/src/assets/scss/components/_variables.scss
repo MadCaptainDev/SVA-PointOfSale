@@ -2,20 +2,20 @@
 @import "~bootstrap/scss/functions";
 @import "../base/functions/mode";
 
-$primaryFont: "Poppins", Helvetica, sans-serif;
+$primaryFont: "Inter", system-ui, -apple-system, sans-serif;
 
-$cyan: #6571FF !default;
-$gray: #ADB5BD !default;
-$blue: #0099FB !default;
-$green: #0AC074 !default;
-$red:   #F62947 !default;
-$yellow: #FFB821 !default;
+$cyan: #6366f1 !default;
+$gray: #8b90a3 !default;
+$blue: #3b82f6 !default;
+$green: #10b981 !default;
+$red:   #ef4444 !default;
+$yellow: #f59e0b !default;
 //$white: if(isDarkMode(), #13151F, #FFFFFF) !default;
 //$black: if(isDarkMode(), #060917, #EFF3F6) !default;
 $white: #FFFFFF !default;
-$black: #060917 !default;
-$pink: #FF679B !default;
-$orange: #FF8717 !default;
+$black: #1a1d29 !default;
+$pink: #ec4899 !default;
+$orange: #f97316 !default;
 
 $primary: $cyan !default;
 $secondary: $gray !default;
@@ -103,7 +103,7 @@ $warning-light:                     $yellow-100 !default;
 $danger-light:                      $red-100 !default;
 
 $body-bg:                           if(isDarkMode(), #13151F, $white) !default;
-$page-body-bg:                      if(isDarkMode(), $black, #EFF3F7) !default;
+$page-body-bg:                      if(isDarkMode(), $black, #f5f6fa) !default;
 
 $theme-light-colors: (
     "primary":    $primary-light,
@@ -172,7 +172,7 @@ $theme-colors-palette: (
 ) !default;  // Custom variable
 
 //custom variable
-$theme-box-shadow:                  if(isDarkMode(), 0 5px 20px rgba(0, 0, 0, 0.2), 0 5px 20px rgba(173, 181, 189, 0.2)) !default;
+$theme-box-shadow:                  if(isDarkMode(), 0 5px 20px rgba(0, 0, 0, 0.2), 0 2px 16px rgba(0, 0, 0, 0.06)) !default;
 
 // Content Spacing
 $content-spacing: (
@@ -181,14 +181,14 @@ $content-spacing: (
 ) !default;
 
 // border-radius-variables
-$border-radius:                     0.313rem !default;
+$border-radius:                     0.625rem !default;
 $border-radius-sm:                  0.625rem !default;
-$border-radius-lg:                  0.938rem !default;
+$border-radius-lg:                  1rem !default;
 
 // buttons
-$input-btn-padding-y:               0.563rem !default;
-$input-btn-padding-x:               1.563rem !default;
-$input-btn-font-size:               0.875rem !default;
+$input-btn-padding-y:               0.688rem !default;
+$input-btn-padding-x:               1.125rem !default;
+$input-btn-font-size:               0.8125rem !default;
 $btn-focus-box-shadow:              0 !default;
 $btn-border-radius-sm :             $border-radius !default;
 
@@ -214,15 +214,15 @@ $form-label-font-size:              0.875rem !default;
 $form-label-font-weight:            500 !default;
 
 // form control - text input variables
-$input-bg:                          $body-bg !default;
+$input-bg:                          #fafbfc !default;
 $input-color:                       $gray-600 !default;
 $input-font-size:                   0.875rem !default;
-$input-padding-y:                   0.688rem !default;
-$input-padding-x:                   0.938rem !default;
-$input-border-radius:               0.313rem !default;
-$input-border-color:                $gray-400 !default;
-$input-focus-border-color:          none !default;
-$input-focus-box-shadow:            none !default;
+$input-padding-y:                   0.625rem !default;
+$input-padding-x:                   0.875rem !default;
+$input-border-radius:               0.625rem !default;
+$input-border-color:                #eef0f5 !default;
+$input-focus-border-color:          $cyan !default;
+$input-focus-box-shadow:            0 0 0 0.2rem rgba(99, 102, 241, 0.1) !default;
 
 // form control - select box variables
 $form-select-focus-border-color:    none !default;
@@ -239,9 +239,9 @@ $form-check-input-border:           none !default;
 // Table Variables
 $table-color:                       $gray-600 !default;
 $table-striped-bg:                  $body-bg !default;
-$table-th-font-weight:              500 !default;
-$table-cell-padding-x:              1.313rem !default;
-$table-border-color:                $gray-200 !default;
+$table-th-font-weight:              600 !default;
+$table-cell-padding-x:              1rem !default;
+$table-border-color:                #eef0f5 !default;
 
 // Table Pagination Variables
 $pagination-bg:                     $page-body-bg !default;
@@ -259,23 +259,24 @@ $progress-border-radius:            0.25rem !default;
 // card variables
 $card-bg:                           $body-bg !default;
 $card-cap-bg:                       $body-bg !default;
-$card-cap-padding-y:                1.75rem !default;
-$card-cap-padding-x:                1.75rem !default;
-$card-border-width:                 0 !default;
-$card-spacer-y:                     2.5rem !default;
-$card-spacer-x:                     2.5rem !default;
-$card-border-radius:                0.625rem !default;
-$card-box-shadow:                   if(isDarkMode(), null, 0 0 20px rgba($gray, 0.1)) !default;
+$card-cap-padding-y:                1.5rem !default;
+$card-cap-padding-x:                1.5rem !default;
+$card-border-width:                 1px !default;
+$card-border-color:                 #eef0f5 !default;
+$card-spacer-y:                     1.5rem !default;
+$card-spacer-x:                     1.5rem !default;
+$card-border-radius:                1rem !default;
+$card-box-shadow:                   if(isDarkMode(), null, 0 2px 12px rgba(0, 0, 0, 0.04)) !default;
 
 //modal variables
 $modal-content-bg:                  $body-bg !default;
-$modal-inner-padding:               1.875rem !default;
+$modal-inner-padding:               1.5rem !default;
 $modal-dialog-margin-y-sm-up:       2.5rem !default;
-$modal-header-padding-y:            1.875rem !default;
-$modal-header-padding-x:            1.875rem !default;
-$modal-content-border-radius:       0.625rem !default;
-$modal-content-border-width:        0 !default;
-$modal-content-box-shadow-xs:       $theme-box-shadow !default;
+$modal-header-padding-y:            1.5rem !default;
+$modal-header-padding-x:            1.5rem !default;
+$modal-content-border-radius:       1rem !default;
+$modal-content-border-width:        1px !default;
+$modal-content-box-shadow-xs:       0 20px 60px rgba(0, 0, 0, 0.1) !default;
 $modal-md:                          440px !default;
 
 // alert variables
@@ -352,7 +353,7 @@ $font-small: 0.75rem !default; // 12 px
 $font-big: 1.875rem !default; // 30 px
 $font-bigger: 2rem !default; // 32 px
 
-$font-weight-bold:            500 !default;
+$font-weight-bold:            600 !default;
 
 // Image Sizes
 $image-sizes: (

@@ -64,31 +64,27 @@ const Product = (props) => {
             .map((qty) => qty.quantity)[0];
 
         if (updateProducts.filter((item) => item.id === product.id).length > 0) {
-            if (filterQty >= product.attributes.stock.quantity) {
+            // Show warning if quantity will exceed stock, but still allow adding
+            if (
+                filterQty >= product.attributes.stock.quantity &&
+                settings.attributes?.show_stock_warning === "1"
+            ) {
                 dispatch(
                     addToast({
-                        text: getFormattedMessage(
-                            "pos.quantity.exceeds.quantity.available.in.stock.message"
-                        ),
-                        type: toastType.ERROR,
+                        text: "Stock is less than requested quantity",
+                        type: toastType.WARNING,
                     })
                 );
-            } else {
-                setUpdateProducts((updateProducts) =>
-                    updateProducts.map((item) =>
-                        item.id === product.id
-                            ? {
-                                ...item,
-                                quantity:
-                                    product.attributes.stock.quantity > item.quantity
-                                        ? item.quantity + 1
-                                        : item.quantity,
-                            }
-                            : item
-                    )
-                );
-                updateCart(updateProducts, { ...product, warehouse_id: selectedOption.value });
             }
+            // Always increment — never block the POS flow
+            setUpdateProducts((updateProducts) =>
+                updateProducts.map((item) =>
+                    item.id === product.id
+                        ? { ...item, quantity: item.quantity + 1 }
+                        : item
+                )
+            );
+            updateCart(updateProducts, { ...product, warehouse_id: selectedOption.value });
         } else {
             setUpdateProducts((prevSelected) => [
                 ...prevSelected,
