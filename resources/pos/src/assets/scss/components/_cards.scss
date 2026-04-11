@@ -2,15 +2,24 @@
 @import "../base/mixin/breakpoints";
 @import "../base/functions/get";
 
+.card {
+    border: 1px solid #eef0f5;
+    border-radius: 1rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.2s ease;
+}
+
 .card-header {
     display: flex !important;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    border-bottom: 1px solid #eef0f5;
+    background: transparent;
 }
 
 @include media-breakpoint-down(lg) {
     .card-body {
-        padding: 1.25rem
+        padding: 1.25rem;
     }
 }

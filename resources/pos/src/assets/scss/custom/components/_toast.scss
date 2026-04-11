@@ -5,8 +5,9 @@
     z-index: 999999;
 
     &__toast {
-        box-shadow: 0 1rem 2rem 1rem rgba(173, 181, 189, 0.2);
-        border-radius: 10px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        border-radius: 0.75rem;
+        border: 1px solid #eef0f5;
         min-height: 80px;
     }
 
@@ -17,7 +18,7 @@
 }
 
 .toast-card {
-    font-family: Poppins, Helvetica, "sans-serif";
+    font-family: 'Inter', system-ui, sans-serif;
     margin-right: 30px !important;
 
     &__icon {

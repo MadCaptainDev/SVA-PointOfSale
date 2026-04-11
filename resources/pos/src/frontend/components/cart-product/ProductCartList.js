@@ -20,6 +20,7 @@ const ProductCartList = (props) => {
         setUpdateProducts,
         posAllProducts,
         allConfigData,
+        settings,
     } = props;
     const dispatch = useDispatch();
     const totalQty = posAllProducts
@@ -51,6 +52,18 @@ const ProductCartList = (props) => {
     // };
     
     const handleIncrement = () => {
+        const newQty = singleProduct.quantity + 1;
+        if (
+            newQty > totalQty[0] &&
+            settings?.attributes?.show_stock_warning === "1"
+        ) {
+            dispatch(
+                addToast({
+                    text: "Stock is less than requested quantity",
+                    type: toastType.WARNING,
+                })
+            );
+        }
         setUpdateProducts((updateProducts) =>
             updateProducts.map((item) => {
                 if (item.id === singleProduct.id) {
@@ -87,45 +100,39 @@ const ProductCartList = (props) => {
             }
         }
 
-setUpdateProducts((updateProducts) =>
+        const newQty = Number(value);
+        if (
+            newQty > totalQty[0] &&
+            settings?.attributes?.show_stock_warning === "1"
+        ) {
+            dispatch(
+                addToast({
+                    text: "Stock is less than requested quantity",
+                    type: toastType.WARNING,
+                })
+            );
+        }
+
+        setUpdateProducts((updateProducts) =>
             updateProducts.map((item) => {
                 if (item.id === singleProduct.id) {
                     return {
                         ...item,
-                        quantity: Number(e.target.value),
+                        quantity: newQty,
                     };
                 }
                 return item;
             })
         );
-        // setUpdateProducts((updateProducts) =>
-        //     updateProducts.map((item) => {
-        //         if (item.id === singleProduct.id) {
-        //             if (totalQty[0] < Number(e.target.value)) {
-        //                 dispatch(
-        //                     addToast({
-        //                         text: getFormattedMessage(
-        //                             "pos.product-quantity-error.message"
-        //                         ),
-        //                         type: toastType.ERROR,
-        //                     })
-        //                 );
-        //                 return { ...item, quantity: totalQty[0] };
-        //             } else {
-        //                 return {
-        //                     ...item,
-        //                     quantity: Number(e.target.value),
-        //                 };
-        //             }
-        //         } else {
-        //             return item;
-        //         }
-        //     })
-        // );
     };
 
+    const isStockExceeded =
+        singleProduct.quantity > totalQty[0] &&
+        settings?.attributes?.show_stock_warning === "1";
+
     return (
-        <tr key={index} className="align-middle">
+        <tr key={index} className={`align-middle ${isStockExceeded ? 'stock-exceeded-row' : ''}`}>
+            <td className="text-start">{index + 1}</td>
             <td className="text-nowrap text-nowrap ps-0">
                 <h4 className="product-name text-gray-900 mb-1 text-capitalize text-truncate">
                     {singleProduct.name}
@@ -139,6 +146,12 @@ setUpdateProducts((updateProducts) =>
                         onClick={() => onClickUpdateItemInCart(singleProduct)}
                     />
                 </span>
+                {isStockExceeded && (
+                    <span className="badge bg-warning text-dark ms-2" style={{ fontSize: '0.65rem' }}>
+                        <i className="bi bi-exclamation-triangle-fill me-1" />
+                        Low Stock
+                    </span>
+                )}
             </td>
             <td>
                 <div className="counter d-flex align-items-center pos-custom-qty">
@@ -156,6 +169,7 @@ setUpdateProducts((updateProducts) =>
                         className="hide-arrow"
                         onKeyPress={(event) => decimalValidate(event)}
                         onChange={(e) => handleChange(e)}
+                        style={isStockExceeded ? { color: '#dc3545', fontWeight: 'bold' } : {}}
                     />
                     <Button
                         type="button"

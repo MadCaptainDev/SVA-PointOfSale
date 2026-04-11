@@ -5,11 +5,11 @@
     &__custom-datepicker {
         width: 100%;
         padding: 2.5px;
-        border-radius: 0.475rem;
+        border-radius: 0.625rem;
         height: 45px;
-        border: 1px solid $gray-400;
+        border: 1px solid #eef0f5;
         box-shadow: unset;
-        font-family: Poppins, Helvetica, "sans-serif";
+        font-family: 'Inter', system-ui, sans-serif;
         font-weight: 500;
         color: $gray-600;
         font-size: 14px;

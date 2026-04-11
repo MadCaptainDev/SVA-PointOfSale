@@ -23,6 +23,7 @@ const ProductSearchbar = (props) => {
         posSearchCodeProduct,
         posSearchNameProduct,
         selectedOption,
+        settings,
     } = props;
     const [searchString, setSearchString] = useState("");
     const [keyDown, setKeyDown] = useState(false);
@@ -116,29 +117,30 @@ const ProductSearchbar = (props) => {
                     // || item.name === code.name
                 ).length > 0
             ) {
-                if (filterQty >= singleProduct[0]) {
+                // Show warning if quantity will exceed stock, but still allow
+                if (
+                    filterQty >= singleProduct[0] &&
+                    settings.attributes?.show_stock_warning === "1"
+                ) {
                     dispatch(
                         addToast({
-                            text: getFormattedMessage(
-                                "pos.quantity.exceeds.quantity.available.in.stock.message"
-                            ),
-                            type: toastType.ERROR,
+                            text: "Stock is less than requested quantity",
+                            type: toastType.WARNING,
                         })
                     );
-                } else {
-                    setUpdateProducts((updateProducts) =>
-                        updateProducts.map((item) =>
-                            (item.code === code ||
-                                item.name === code ||
-                                item.code === code.code) &&
-                            // || item.name === code.name
-                            singleProduct[0] > item.quantity
-                                ? { ...item, quantity: item.quantity + 1 }
-                                : item
-                        )
-                    );
-                    setKeyDown(false);
                 }
+                // Always increment — never block the POS flow
+                setUpdateProducts((updateProducts) =>
+                    updateProducts.map((item) =>
+                        (item.code === code ||
+                            item.name === code ||
+                            item.code === code.code)
+                            // || item.name === code.name
+                            ? { ...item, quantity: item.quantity + 1 }
+                            : item
+                    )
+                );
+                setKeyDown(false);
             } else {
                 setUpdateProducts([
                     ...updateProducts,

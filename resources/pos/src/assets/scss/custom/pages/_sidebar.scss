@@ -17,6 +17,7 @@
 
     .pro-sidebar-inner {
         background-color: $white !important;
+        border-right: 1px solid #eef0f5;
 
         @media (max-width: 992px) {
             min-height: 100vh;
@@ -29,35 +30,43 @@
     }
 
     .pro-menu {
-        padding: 0px !important;
+        padding: 0.25rem 0.5rem !important;
+
         &.sidebar-scrolling {
             height: calc(100% - 70px);
         }
 
         .pro-menu-item {
             .pro-inner-item {
-                border-left: 0.313rem solid transparent;
-                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
-                padding: 5px 20px 5px 18px;
-                font-size: .875rem;
+                border-left: none;
+                border-radius: 0.625rem;
+                transition: all 0.2s ease;
+                padding: 6px 14px 6px 14px;
+                font-size: 0.875rem;
+                margin: 1px 0;
 
                 &:hover {
-                    background-color: $primary-light;
-                    border-left: 0.313rem solid $primary !important;
+                    background-color: #f5f6fa;
+                    border-left: none !important;
 
                     svg, .pro-item-content a {
-                        color: $gray-900;
+                        color: #1a1d29;
                     }
                 }
             }
 
             &.active {
                 .pro-inner-item {
-                    background-color: $primary-light;
-                    border-left: 0.313rem solid $primary !important;
+                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                    border-left: none !important;
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 
-                    svg, .pro-item-content a {
-                        color: $gray-900;
+                    svg, .pro-item-content a, .pro-icon {
+                        color: $white !important;
+                    }
+
+                    span.pro-item-content {
+                        color: $white !important;
                     }
                 }
             }
@@ -67,7 +76,7 @@
                 margin-left: 0 !important;
 
                 .pro-icon {
-                    color: $gray-600;
+                    color: #8b90a3;
                     font-size: 0.875rem !important;
                     animation: unset !important;
                 }
@@ -75,10 +84,10 @@
 
             .pro-item-content {
                 a {
-                    color: $gray-600;
+                    color: #8b90a3;
+                    font-weight: 500;
                 }
             }
-
 
             .pro-inner-list-item {
                 position: relative;
@@ -88,67 +97,65 @@
             .pro-inner-list-item ul {
                 padding: 0px !important;
             }
-
             .pro-inner-list-item .pro-inner-item {
-                padding: 10px 43px 10px 43px !important;
+                padding: 8px 20px 8px 40px !important;
             }
-            span.pro-item-content{
-                color: $gray-600;
+            span.pro-item-content {
+                color: #8b90a3;
             }
-            .pro-inner-list-item ul span.pro-item-content{
+            .pro-inner-list-item ul span.pro-item-content {
                 padding-left: 10px !important;
             }
         }
 
-        .pro-menu-item.pro-sub-menu.pro-active-sub  > div > .pro-item-content{
-            // background-color: $primary-light;
+        .pro-menu-item.pro-sub-menu.pro-active-sub > div > .pro-item-content {
             color: $primary !important;
         }
-        .pro-menu-item.pro-sub-menu.pro-active-sub  > div.pro-inner-item{
-            border-left: 0.313rem solid $primary !important;
+        .pro-menu-item.pro-sub-menu.pro-active-sub > div.pro-inner-item {
+            border-left: none !important;
+            background-color: #f5f6fa;
         }
-        .pro-menu-item.pro-sub-menu.pro-active-sub-search  > div{
-            background-color: $primary-light;
+        .pro-menu-item.pro-sub-menu.pro-active-sub-search > div {
+            background-color: #f5f6fa;
         }
-
     }
-
 }
 
-.pro-sidebar.collapsed .pro-menu>ul>.pro-menu-item.pro-sub-menu:hover{
-    .react-slidedown.pro-inner-list-item{
-        transition: visibility,transform .3s;
+.pro-sidebar.collapsed .pro-menu>ul>.pro-menu-item.pro-sub-menu:hover {
+    .react-slidedown.pro-inner-list-item {
+        transition: visibility, transform .3s;
         position: fixed;
         left: 82px;
         margin: 0px;
         display: block !important;
-        color: $gray-600;
+        color: #8b90a3;
         background-color: white !important;
-        border-radius: 5px;
+        border-radius: 0.75rem;
         margin-top: -44px;
-        box-shadow: 0 4px 20px 1px rgb(0 0 0 / 6%), 0 1px 4px rgb(0 0 0 / 8%) !important;
-        }
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
+        border: 1px solid #eef0f5;
+    }
 }
 
 .react-slidedown {
     transition-duration: 0.3s !important;
 }
 
-.notShow{
+.notShow {
     display: none;
 }
 
-.openMenu{
+.openMenu {
     display: block !important;
     height: auto !important;
-    transition-duration: 0.5s !important;
-}
-.closeMenu{
-    display: none !important;
-    height: 0px !important;
-    transition-duration: 0.5s !important;
+    transition-duration: 0.4s !important;
 }
 
+.closeMenu {
+    display: none !important;
+    height: 0px !important;
+    transition-duration: 0.4s !important;
+}
 
 .open-menu {
     @media (max-width: 1199px) {
@@ -164,11 +171,11 @@
 
 .header-active {
     border-bottom: 2px solid $primary;
-    color: $black !important;
+    color: #1a1d29 !important;
 }
 
 .header-tabs:hover, .header-tabs:focus {
-    color: $black !important;
+    color: #1a1d29 !important;
     border-bottom: 2px solid $primary;
 }
 

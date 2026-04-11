@@ -1,5 +1,5 @@
 .custom-search {
-    font-family: Poppins, Helvetica, "sans-serif";
+    font-family: 'Inter', system-ui, sans-serif;
 
     &:nth-child(1) {
         position: relative !important;
@@ -9,7 +9,7 @@
     .wrapper {
         z-index: 11 !important;
         border: none !important;
-        border-radius: 0.475rem !important;
+        border-radius: 0.625rem !important;
         background-color: transparent !important;
         box-shadow: none !important;
         padding-left: 0 !important;
@@ -23,7 +23,7 @@
         div:nth-child(2) {
             font-size: 14px !important;
             background: $white !important;
-            border: 1px solid #ced4da !important;
+            border: 1px solid #eef0f5 !important;
             border-radius: 0.475rem !important;
 
             > .line {
@@ -38,7 +38,7 @@
 
             ul {
                 padding-bottom: 0 !important;
-                font-family: Poppins, Helvetica, "sans-serif" !important;
+                font-family: 'Inter', system-ui, sans-serif !important;
 
                 li {
                     position: relative !important;
@@ -108,7 +108,7 @@
         padding-left: 42px !important;
         border-radius: 0.475rem !important;
         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
-        font-family: Poppins, Helvetica, "sans-serif" !important;
+        font-family: 'Inter', system-ui, sans-serif !important;
 
         &::placeholder {
             color: #6C757D !important;
