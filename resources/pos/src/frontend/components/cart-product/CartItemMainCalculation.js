@@ -22,6 +22,7 @@ const CartItemMainCalculation = (props) => {
         frontSetting,
         allConfigData,
         onChangeTaxCart,
+        selectedOption,
         customer,
     } = props;
 
@@ -34,12 +35,12 @@ const CartItemMainCalculation = (props) => {
 
         <div className="calculation mt-5">
             <div className="user-name-display mb-3">
-                <strong>Cashier:</strong> {firstName}
+                <strong>Cashier:</strong> {firstName} {lastName}
             </div>
 
 
             <div className="user-name-display mb-3">
-                <strong>Location:</strong> {lastName}
+                <strong>Location:</strong> {selectedOption && (selectedOption.label || (selectedOption[0] && selectedOption[0].label))}
             </div>
 
 

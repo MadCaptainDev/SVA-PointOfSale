@@ -345,8 +345,8 @@ const CashPaymentModel = (props) => {
                     onClick={(event) => {
                         if (cashPaymentValue.received_amount !== undefined) {
                             if (
-                                parseInt(cashPaymentValue.received_amount) <
-                                parseInt(grandTotal)
+                                parseFloat(cashPaymentValue.received_amount) <
+                                parseFloat(grandTotal)
                             ) {
                                 dispatch(
                                     addToast({
@@ -372,8 +372,8 @@ const CashPaymentModel = (props) => {
                     onClick={(event) => {
                         if (cashPaymentValue.received_amount !== undefined) {
                             if (
-                                parseInt(cashPaymentValue.received_amount) <
-                                parseInt(grandTotal)
+                                parseFloat(cashPaymentValue.received_amount) <
+                                parseFloat(grandTotal)
                             ) {
                                 dispatch(
                                     addToast({

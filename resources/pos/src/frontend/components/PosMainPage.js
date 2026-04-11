@@ -153,7 +153,6 @@ const PosMainPage = (props) => {
     }, [subTotal, cartItemValue.discount, cartItemValue.point_discount, cartItemValue.tax, cartItemValue.shipping]);
 
     const { userProfile } = useSelector((state) => state);
-    console.log("userProfile:", selectedCustomerOption);
 
     useEffect(() => {
         setSelectedCustomerOption(
@@ -469,7 +468,7 @@ const PosMainPage = (props) => {
             );
             // setModalShowPaymentSlip(true);
             setCashPayment(false);
-            setPaymentPrint(preparePrintData);
+            setPaymentPrint(preparePrintData());
             setCartItemValue({
                 discount_type: discountType.FIXED,
                 discount_value: 0,
@@ -732,6 +731,7 @@ const PosMainPage = (props) => {
                                     allConfigData={allConfigData}
                                     frontSetting={frontSetting}
                                     onChangeTaxCart={onChangeTaxCart}
+                                    selectedOption={selectedOption}
                                     customer={customers && customers.find(c => c.id === (selectedCustomerOption && (selectedCustomerOption.value || (selectedCustomerOption[0] && selectedCustomerOption[0].value))))}
                                 />
                                 <PaymentButton

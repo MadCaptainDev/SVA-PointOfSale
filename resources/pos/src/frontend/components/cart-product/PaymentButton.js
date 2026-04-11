@@ -101,7 +101,7 @@ const PaymentButton = (props) => {
     const resetPaymentModel = () => {
         if (
             updateProducts.length > 0 ||
-            qtyCart.length < 0 ||
+            qtyCart.length > 0 ||
             cartItemValue.tax > 100 ||
             Number(cartItemValue.discount) > grandTotal ||
             Number(cartItemValue.shipping) > Number(subTotal)
@@ -113,7 +113,7 @@ const PaymentButton = (props) => {
     const holdPaymentModel = () => {
         if (
             updateProducts.length > 0 ||
-            qtyCart.length < 0 ||
+            qtyCart.length > 0 ||
             cartItemValue.tax > 100 ||
             Number(cartItemValue.discount) > grandTotal ||
             Number(cartItemValue.shipping) > Number(subTotal)
