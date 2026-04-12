@@ -36,8 +36,8 @@ mix.js('resources/pos/src/index.js', 'public/js/app.js').version();
 mix.copyDirectory('resources/images',
     'public/images')
 
-// fronted css
-// mix.sass([
-//     'resources/pos/src/frontend/assets/sass/bootstrap.scss',
-//     'resources/pos/src/frontend/assets/sass/pos.scss'
-// ], 'public/css/app.css').version();
+// Compile POS frontend SCSS → CSS (pos.scss design system)
+mix.sass(
+    'resources/pos/src/assets/scss/frontend/frontend.scss',
+    'resources/pos/src/assets/css/frontend.css'
+);
