@@ -1,7 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { Form, InputGroup, FormControl } from "react-bootstrap-v5";
-import { Row } from "react-bootstrap";
 import { Tokens } from '../../../constants/index'
 import {
     currencySymbolHandling,
@@ -26,200 +24,121 @@ const CartItemMainCalculation = (props) => {
         customer,
     } = props;
 
-
-    const firstName = localStorage.getItem(Tokens.UPDATED_FIRST_NAME) || '';
-    const lastName = localStorage.getItem(Tokens.UPDATED_LAST_NAME) || '';
-
+    const symbol = frontSetting.value && frontSetting.value.currency_symbol;
 
     return (
+        <div className="calculation">
+            {/* Order totals */}
+            <div className="summary-row">
+                <span>{getFormattedMessage("pos-total-qty.title")}</span>
+                <b>{totalQty || "0"}</b>
+            </div>
+            <div className="summary-row">
+                <span>{getFormattedMessage("pos.subtotal.small.title")}</span>
+                <b>{currencySymbolHandling(allConfigData, symbol, subTotal ? subTotal : "0.00")}</b>
+            </div>
+            <div className="summary-divider" />
 
-        <div className="calculation mt-5">
-            <div className="user-name-display mb-3">
-                <strong>Cashier:</strong> {firstName} {lastName}
+            {/* Discount */}
+            <div className="mb-3">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                    <label className="pos-label mb-0">{getFormattedMessage("globally.detail.discount")}</label>
+                    <div style={{ display: "flex", gap: "12px" }}>
+                        <Form.Check
+                            type="radio"
+                            id="fixed"
+                            name="discount_type"
+                            label={placeholderText("discount-type.filter.fixed.label")}
+                            onChange={(e) => onChangeCart(e)}
+                            value={discountType.FIXED}
+                            checked={cartItemValue.discount_type == discountType.FIXED}
+                            style={{ fontSize: "12px" }}
+                        />
+                        <Form.Check
+                            type="radio"
+                            id="percentage"
+                            name="discount_type"
+                            label={placeholderText("discount-type.filter.percentage.label")}
+                            onChange={(e) => onChangeCart(e)}
+                            value={discountType.PERCENTAGE}
+                            checked={cartItemValue.discount_type == discountType.PERCENTAGE}
+                            style={{ fontSize: "12px" }}
+                        />
+                    </div>
+                </div>
+                <InputGroup>
+                    <FormControl
+                        type="text"
+                        id="discount"
+                        className="pos-input"
+                        style={{ borderRadius: "10px 0 0 10px !important" }}
+                        onChange={(e) => onChangeCart(e)}
+                        value={cartItemValue.discount_value === 0 ? "" : cartItemValue.discount_value}
+                        onKeyPress={(e) => decimalValidate(e)}
+                        name="discount_value"
+                        min="0"
+                        step=".01"
+                        placeholder={placeholderText("purchase.order-item.table.discount.column.label")}
+                    />
+                    <InputGroup.Text style={{ borderRadius: "0 10px 10px 0", border: "1px solid var(--border-light)", background: "#fafbfc", color: "var(--text-muted)", fontSize: "13px" }}>
+                        {cartItemValue.discount_type == discountType.PERCENTAGE ? "%" : symbol}
+                    </InputGroup.Text>
+                </InputGroup>
             </div>
 
-
-            <div className="user-name-display mb-3">
-                <strong>Location:</strong> {selectedOption && (selectedOption.label || (selectedOption[0] && selectedOption[0].label))}
+            {/* Shipping */}
+            <div className="mb-3">
+                <label className="pos-label">{placeholderText("purchase.input.shipping.label")}</label>
+                <InputGroup>
+                    <FormControl
+                        type="text"
+                        id="shipping"
+                        name="shipping"
+                        min="0"
+                        step=".01"
+                        className="pos-input"
+                        style={{ borderRadius: "10px 0 0 10px !important" }}
+                        placeholder={placeholderText("purchase.input.shipping.label")}
+                        onChange={(e) => onChangeCart(e)}
+                        onKeyPress={(e) => decimalValidate(e)}
+                        value={cartItemValue.shipping === 0 ? "" : cartItemValue.shipping}
+                    />
+                    <InputGroup.Text style={{ borderRadius: "0 10px 10px 0", border: "1px solid var(--border-light)", background: "#fafbfc", color: "var(--text-muted)", fontSize: "13px" }}>
+                        {symbol}
+                    </InputGroup.Text>
+                </InputGroup>
             </div>
 
-
-            <Row className="total-price">
-                <div className="col-6 mb-2">
-                    <Form.Group className="calculation__filed-grp mb-2 d-none">
-                        <InputGroup>
-                            <FormControl
-
-                                type="text"
-                                id="tax"
-                                name="tax"
-                                min="0"
-                                step=".01"
-                                placeholder={placeholderText(
-                                    "globally.detail.tax"
-                                )}
-                                onChange={(e) => onChangeTaxCart(e)}
-                                onKeyPress={(event) => numValidate(event)}
-                                value={
-                                    cartItemValue.tax === 0
-                                        ? ""
-                                        : cartItemValue.tax
-                                }
-                                className="rounded-1 pe-8"
-                            />
-                            <InputGroup.Text className="position-absolute top-0 bottom-0 end-0 bg-transparent border-0">
-                                %
-                            </InputGroup.Text>
-                        </InputGroup>
-                    </Form.Group>
-                    <Form.Group className="calculation__filed-grp mb-2" controlId="discountType">
-                        <div className="d-flex flex-lg-nowrap flex-wrap gap-3">
-                            <Form.Label className="mb-0">{getFormattedMessage("globally.detail.discount")}</Form.Label>
-                            <Form.Group className="d-flex flex-wrap gap-2">
-                                <Form.Check
-                                    type="radio"
-                                    id="fixed"
-                                    name="discount_type"
-                                    label={placeholderText(
-                                        "discount-type.filter.fixed.label"
-                                    )}
-                                    onChange={(e) => onChangeCart(e)}
-                                    value={discountType.FIXED}
-                                    checked={
-                                        cartItemValue.discount_type == discountType.FIXED
-                                    }
-                                />
-                                <Form.Check
-                                    type="radio"
-                                    id="percentage"
-                                    name="discount_type"
-                                    label={placeholderText(
-                                        "discount-type.filter.percentage.label"
-                                    )}
-                                    onChange={(e) => onChangeCart(e)}
-                                    value={discountType.PERCENTAGE}
-                                    className="me-md-2"
-                                    checked={
-                                        cartItemValue.discount_type == discountType.PERCENTAGE} />
-                            </Form.Group>
-                            <div className="mb-3">
-
-                            </div>
-                        </div>
-                    </Form.Group>
-                    <Form.Group className="calculation__filed-grp mb-2">
-                        <InputGroup>
-                            <FormControl
-                                type="text"
-                                id="discount"
-                                className="rounded-1 pe-8"
-                                onChange={(e) => onChangeCart(e)}
-                                value={
-                                    cartItemValue.discount_value === 0
-                                        ? ""
-                                        : cartItemValue.discount_value
-                                }
-                                onKeyPress={(event) => decimalValidate(event)}
-                                name="discount_value"
-                                min="0"
-                                step=".01"
-                                placeholder={placeholderText(
-                                    "purchase.order-item.table.discount.column.label"
-                                )}
-                            />
-                            <InputGroup.Text className="position-absolute top-0 bottom-0 end-0 bg-transparent border-0">
-                                {cartItemValue.discount_type == discountType.PERCENTAGE ? '%' : frontSetting.value &&
-                                    frontSetting.value.currency_symbol}
-                            </InputGroup.Text>
-                        </InputGroup>
-                    </Form.Group>
-                    <Form.Group className="calculation__filed-grp mb-2">
-                        <InputGroup>
-                            <FormControl
-                                type="text"
-                                id="shipping"
-                                name="shipping"
-                                min="0"
-                                step=".01"
-                                placeholder={placeholderText(
-                                    "purchase.input.shipping.label"
-                                )}
-                                onChange={(e) => onChangeCart(e)}
-                                onKeyPress={(event) => decimalValidate(event)}
-                                value={
-                                    cartItemValue.shipping === 0
-                                        ? ""
-                                        : cartItemValue.shipping
-                                }
-                                className="rounded-1 pe-8"
-                            />
-                            <InputGroup.Text className="position-absolute top-0 bottom-0 end-0 bg-transparent border-0">
-                                {frontSetting.value &&
-                                    frontSetting.value.currency_symbol}
-                            </InputGroup.Text>
-                        </InputGroup>
-                    </Form.Group>
-                    <Form.Group className="calculation__filed-grp mb-2">
-                        <div className="d-flex justify-content-between">
-                            <Form.Label className="mb-0">{getFormattedMessage("pos.available-points.label")}:</Form.Label>
-                            <span className="fw-bold">{customer ? (customer.attributes ? customer.attributes.points : customer.points) : 0}</span>
-                        </div>
-                        <InputGroup className="mt-1">
-                            <FormControl
-                                type="text"
-                                id="redeem_points"
-                                name="redeem_points"
-                                min="0"
-                                placeholder={placeholderText(
-                                    "pos.redeem-points.label"
-                                )}
-                                onChange={(e) => onChangeCart(e)}
-                                onKeyPress={(event) => numValidate(event)}
-                                value={
-                                    cartItemValue.redeem_points === 0
-                                        ? ""
-                                        : cartItemValue.redeem_points
-                                }
-                                className="rounded-1 pe-8"
-                            />
-                        </InputGroup>
-                    </Form.Group>
+            {/* Redeem Points */}
+            <div className="mb-3">
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
+                    <label className="pos-label mb-0">{getFormattedMessage("pos.available-points.label")}</label>
+                    <b style={{ fontSize: "13px", color: "var(--text-dark)" }}>
+                        {customer ? (customer.attributes ? customer.attributes.points : customer.points) : 0}
+                    </b>
                 </div>
-                <div className="col-6 d-flex flex-column justify-content-center text-end align-items-end mb-2">
-                    <h4 className="fs-3 mb-2 custom-big-content text-gray-600">
-                        {getFormattedMessage("pos-total-qty.title")} :{" "}
-                        {totalQty ? totalQty : "0"}
-                    </h4>
-                    <h4 className="fs-3 mb-2 text-gray-600">
-                        {getFormattedMessage("pos.subtotal.small.title")} :{" "}
-                        {currencySymbolHandling(
-                            allConfigData,
-                            frontSetting.value &&
-                            frontSetting.value.currency_symbol,
-                            subTotal ? subTotal : "0.00"
-                        )}
-                    </h4>
-                    <h4 className="fs-3 mb-2 text-gray-600">
-                        {getFormattedMessage("pos.point-discount.label")} :{" "}
-                        {currencySymbolHandling(
-                            allConfigData,
-                            frontSetting.value &&
-                            frontSetting.value.currency_symbol,
-                            cartItemValue.point_discount ? cartItemValue.point_discount : "0.00"
-                        )}
-                    </h4>
-                    <h2 className="fs-1 mb-2 text-gray-800">
-                        {getFormattedMessage("pos-total.title")} :{" "}
-                        {currencySymbolHandling(
-                            allConfigData,
-                            frontSetting.value &&
-                            frontSetting.value.currency_symbol,
-                            grandTotal ? grandTotal : "0.00"
-                        )}
-                    </h2>
-                </div>
-            </Row>
+                <FormControl
+                    type="text"
+                    id="redeem_points"
+                    name="redeem_points"
+                    min="0"
+                    className="pos-input"
+                    placeholder={placeholderText("pos.redeem-points.label")}
+                    onChange={(e) => onChangeCart(e)}
+                    onKeyPress={(e) => numValidate(e)}
+                    value={cartItemValue.redeem_points === 0 ? "" : cartItemValue.redeem_points}
+                />
+            </div>
+
+            <div className="summary-divider" />
+
+            {/* Calculated totals */}
+            <div className="summary-row">
+                <span>{getFormattedMessage("pos.point-discount.label")}</span>
+                <b>{currencySymbolHandling(allConfigData, symbol, cartItemValue.point_discount ? cartItemValue.point_discount : "0.00")}</b>
+            </div>
         </div>
     );
 };
+
 export default CartItemMainCalculation;

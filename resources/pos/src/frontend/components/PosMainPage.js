@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Col, Container, Row, Table } from "react-bootstrap-v5";
 import { connect, useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { useReactToPrint } from "react-to-print";
@@ -16,6 +15,7 @@ import ProductSearchbar from "./product/ProductSearchbar";
 import { prepareCartArray } from "../shared/PrepareCartArray";
 import ProductDetailsModel from "../shared/ProductDetailsModel";
 import CartItemMainCalculation from "./cart-product/CartItemMainCalculation";
+import InlinePaymentPanel from "./cart-product/InlinePaymentPanel";
 import PosHeader from "./header/PosHeader";
 import { posCashPaymentAction } from "../../store/action/pos/posCashPaymentAction";
 import PaymentButton from "./cart-product/PaymentButton";
@@ -71,14 +71,14 @@ const PosMainPage = (props) => {
         fetchCustomer,
         customers,
     } = props;
+
     const componentRef = useRef();
     const registerDetailsRef = useRef();
-    // const [play] = useSound('https://s3.amazonaws.com/freecodecamp/drums/Heater-4_1.mp3');
+
     const [openCalculator, setOpenCalculator] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [updateProducts, setUpdateProducts] = useState([]);
-    const [isOpenCartItemUpdateModel, setIsOpenCartItemUpdateModel] =
-        useState(false);
+    const [isOpenCartItemUpdateModel, setIsOpenCartItemUpdateModel] = useState(false);
     const [product, setProduct] = useState(null);
     const [cartProductIds, setCartProductIds] = useState([]);
     const [newCost, setNewCost] = useState("");
@@ -94,7 +94,7 @@ const PosMainPage = (props) => {
     const [updateHolList, setUpdateHoldList] = useState(false);
     const [hold_ref_no, setHold_ref_no] = useState("");
     const [cartItemValue, setCartItemValue] = useState({
-        discount_type: discountType.FIXED,    // 0 = fixed, 1 = percentage
+        discount_type: discountType.FIXED,
         discount_value: 0,
         discount: 0,
         tax: 0,
@@ -110,71 +110,50 @@ const PosMainPage = (props) => {
         },
     });
     const [errors, setErrors] = useState({ notes: "" });
-    // const [searchString, setSearchString] = useState('');
     const [changeReturn, setChangeReturn] = useState(0);
     const [showCloseDetailsModal, setShowCloseDetailsModal] = useState(false);
-    const [showPosRegisterModel, setShowPosRegisterModel] = useState(false)
+    const [showPosRegisterModel, setShowPosRegisterModel] = useState(false);
     const { closeRegisterDetails } = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    //total Qty on cart item
     const totalQty = React.useMemo(() => {
-        const localCart = updateProducts.map((updateQty) =>
-            Number(updateQty.quantity)
-        );
-        return localCart.length > 0 ?
-            localCart.reduce((cart, current) => cart + current, 0) : 0;
+        const localCart = updateProducts.map((u) => Number(u.quantity));
+        return localCart.length > 0 ? localCart.reduce((a, b) => a + b, 0) : 0;
     }, [updateProducts]);
 
-    //subtotal on cart item
     const subTotal = React.useMemo(() => {
-        const localTotal = updateProducts.map(
-            (updateQty) =>
-                calculateProductCost(updateQty).toFixed(2) * updateQty.quantity
-        );
-        return localTotal.length > 0 ?
-            localTotal.reduce((cart, current) => cart + current, 0) : 0;
+        const localTotal = updateProducts.map((u) => calculateProductCost(u).toFixed(2) * u.quantity);
+        return localTotal.length > 0 ? localTotal.reduce((a, b) => a + b, 0) : 0;
     }, [updateProducts]);
 
-    const [holdListId, setHoldListValue] = useState({
-        referenceNumber: "",
-    });
+    const [holdListId, setHoldListValue] = useState({ referenceNumber: "" });
 
-    //grand total on cart item
     const { taxTotal, grandTotal } = React.useMemo(() => {
         const discountTotal = subTotal - cartItemValue.discount;
         const taxTotal = (discountTotal * cartItemValue.tax) / 100;
         const mainTotal = discountTotal + taxTotal;
-        const grandTotal = Math.round(
-            Number(mainTotal) + Number(cartItemValue.shipping) - Number(cartItemValue.point_discount)
-        );
+        const grandTotal = Math.round(Number(mainTotal) + Number(cartItemValue.shipping) - Number(cartItemValue.point_discount));
         return { taxTotal, grandTotal };
     }, [subTotal, cartItemValue.discount, cartItemValue.point_discount, cartItemValue.tax, cartItemValue.shipping]);
 
     const { userProfile } = useSelector((state) => state);
 
     useEffect(() => {
-        setSelectedCustomerOption(
-            settings.attributes && {
-                value: Number(settings.attributes.default_customer),
-                label: settings.attributes.customer_name,
-            }
-        );
-        setSelectedOption(
-            settings.attributes && {
-                value: Number(settings.attributes.default_warehouse),
-                label: settings.attributes.warehouse_name,
-            }
-        );
+        setSelectedCustomerOption(settings.attributes && {
+            value: Number(settings.attributes.default_customer),
+            label: settings.attributes.customer_name,
+        });
+        setSelectedOption(settings.attributes && {
+            value: Number(settings.attributes.default_warehouse),
+            label: settings.attributes.warehouse_name,
+        });
     }, [settings]);
 
     useEffect(() => {
         if (selectedCustomerOption) {
             const customerId = selectedCustomerOption.value || (selectedCustomerOption[0] && selectedCustomerOption[0].value);
-            if (customerId) {
-                fetchCustomer(customerId, false);
-            }
+            if (customerId) fetchCustomer(customerId, false);
         }
     }, [selectedCustomerOption]);
 
@@ -186,10 +165,8 @@ const PosMainPage = (props) => {
     }, []);
 
     useEffect(() => {
-        if (allConfigData) {
-            setShowPosRegisterModel(allConfigData?.open_register)
-        }
-    }, [allConfigData])
+        if (allConfigData) setShowPosRegisterModel(allConfigData?.open_register);
+    }, [allConfigData]);
 
     useEffect(() => {
         if (updateHolList === true) {
@@ -205,12 +182,8 @@ const PosMainPage = (props) => {
     const handleValidation = () => {
         let errors = {};
         let isValid = false;
-        if (
-            cashPaymentValue["notes"] &&
-            cashPaymentValue["notes"].length > 100
-        ) {
-            errors["notes"] =
-                "The notes must not be greater than 100 characters";
+        if (cashPaymentValue["notes"] && cashPaymentValue["notes"].length > 100) {
+            errors["notes"] = "The notes must not be greater than 100 characters";
         } else {
             isValid = true;
         }
@@ -218,383 +191,146 @@ const PosMainPage = (props) => {
         return isValid;
     };
 
-    //filter on category id
-    const setCategory = (item) => {
-        setCategoryId(item);
-    };
+    const setCategory = (item) => setCategoryId(item);
 
     useEffect(() => {
         if (selectedOption) {
-            fetchBrandClickable(
-                brandId,
-                categoryId,
-                selectedOption.value && selectedOption.value
-            );
+            fetchBrandClickable(brandId, categoryId, selectedOption.value && selectedOption.value);
         }
     }, [selectedOption, brandId, categoryId]);
 
-    //filter on brand id
-    const setBrand = (item) => {
-        setBrandId(item);
-    };
+    const setBrand = (item) => setBrandId(item);
 
     const onChangeInput = (e) => {
         e.preventDefault();
-        setCashPaymentValue((inputs) => ({
-            ...inputs,
-            [e.target.name]: e.target.value,
-        }));
+        setCashPaymentValue((inputs) => ({ ...inputs, [e.target.name]: e.target.value }));
     };
 
-    const onPaymentStatusChange = (obj) => {
-        setCashPaymentValue((inputs) => ({ ...inputs, payment_status: obj }));
-    };
+    const onPaymentStatusChange = (obj) => setCashPaymentValue((inputs) => ({ ...inputs, payment_status: obj }));
+    const onChangeReturnChange = (change) => setChangeReturn(change);
 
-    const onChangeReturnChange = (change) => {
-        setChangeReturn(change);
-    };
-
-    // payment type dropdown functionality
     const paymentTypeFilterOptions = getFormattedOptions(paymentMethodOptions);
-    const paymentTypeDefaultValue = paymentTypeFilterOptions.map((option) => {
-        return {
-            value: option.id,
-            label: option.name,
-        };
-    });
-    const [paymentValue, setPaymentValue] = useState({
-        payment_type: paymentTypeDefaultValue[0],
-    });
-
-    const onPaymentTypeChange = (obj) => {
-        setPaymentValue({ ...paymentValue, payment_type: obj });
-    };
+    const paymentTypeDefaultValue = paymentTypeFilterOptions.map((o) => ({ value: o.id, label: o.name }));
+    const [paymentValue, setPaymentValue] = useState({ payment_type: paymentTypeDefaultValue[0] });
+    const onPaymentTypeChange = (obj) => setPaymentValue({ ...paymentValue, payment_type: obj });
 
     const onChangeCart = (event) => {
         if (updateProducts.length == 0) {
-            dispatch(addToast({ text: getFormattedMessage("pos.cash-payment.product-error.message"), type: toastType.ERROR }))
+            dispatch(addToast({ text: getFormattedMessage("pos.cash-payment.product-error.message"), type: toastType.ERROR }));
             return;
         }
         const { value } = event.target;
-        // check if value includes a decimal point
         if (value.match(/\./g)) {
             const [, decimal] = value.split(".");
-            // restrict value to only 2 decimal places
-            if (decimal?.length > 2) {
-                // do nothing
-                return;
-            }
+            if (decimal?.length > 2) return;
         }
-
         let discount = cartItemValue.discount;
         if (event.target.name == 'discount_value') {
-            if (cartItemValue.discount_type == discountType.FIXED) {
-                discount = value;
-            } else {
-                discount = (Number(subTotal) * Number(value)) / 100;
-            }
+            discount = cartItemValue.discount_type == discountType.FIXED ? value : (Number(subTotal) * Number(value)) / 100;
         }
         if (event.target.name === 'discount_type') {
-            if (value == discountType.FIXED) {
-                discount = cartItemValue.discount_value;
-            } else {
-                discount = (Number(subTotal) * Number(cartItemValue.discount_value)) / 100;
-            }
+            discount = value == discountType.FIXED ? cartItemValue.discount_value : (Number(subTotal) * Number(cartItemValue.discount_value)) / 100;
         }
-
         let pointDiscount = cartItemValue.point_discount;
         if (event.target.name === 'redeem_points') {
-            const points = value;
-            const rate = settings.attributes && settings.attributes.point_redemption_rate ? settings.attributes.point_redemption_rate : 0;
-            pointDiscount = points * rate;
+            const rate = settings.attributes?.point_redemption_rate || 0;
+            pointDiscount = value * rate;
         }
-
-        setCartItemValue((inputs) => ({
-            ...inputs,
-            discount: discount,
-            point_discount: pointDiscount,
-            [event.target.name]: value,
-        }));
+        setCartItemValue((inputs) => ({ ...inputs, discount, point_discount: pointDiscount, [event.target.name]: value }));
     };
 
     const onChangeTaxCart = (event) => {
         if (updateProducts.length == 0) {
-            dispatch(addToast({ text: getFormattedMessage("pos.cash-payment.product-error.message"), type: toastType.ERROR }))
+            dispatch(addToast({ text: getFormattedMessage("pos.cash-payment.product-error.message"), type: toastType.ERROR }));
             return;
         }
-        const min = 0;
-        const max = 100;
         const { value } = event.target;
-        const values = Math.max(min, Math.min(max, Number(value)));
-        // check if value includes a decimal point
+        const values = Math.max(0, Math.min(100, Number(value)));
         if (value.match(/\./g)) {
             const [, decimal] = value.split(".");
-            // restrict value to only 2 decimal places
-            if (decimal?.length > 2) {
-                // do nothing
-                return;
-            }
+            if (decimal?.length > 2) return;
         }
-        setCartItemValue((inputs) => ({
-            ...inputs,
-            [event.target.name]: values,
-        }));
+        setCartItemValue((inputs) => ({ ...inputs, [event.target.name]: values }));
     };
 
-    //payment slip model onchange
     const handleCashPayment = () => {
         setCashPaymentValue({
             notes: "",
-            payment_status: {
-                label: getFormattedMessage("dashboard.recentSales.paid.label"),
-                value: 1,
-            },
+            payment_status: { label: getFormattedMessage("dashboard.recentSales.paid.label"), value: 1 },
         });
         setCashPayment(!cashPayment);
     };
 
-    const updateCost = (item) => {
-        setNewCost(item);
-    };
+    const updateCost = (item) => setNewCost(item);
+    const openProductDetailModal = () => setIsOpenCartItemUpdateModel(!isOpenCartItemUpdateModel);
+    const onClickUpdateItemInCart = (item) => { setProduct(item); setIsOpenCartItemUpdateModel(true); };
+    const onProductUpdateInCart = () => updateCart(updateProducts.slice());
+    const updatedQty = (qty) => setQuantity(qty);
+    const updateCart = (cartProducts) => setUpdateProducts(cartProducts);
+    const onDeleteCartItem = (productId) => updateCart(updateProducts.filter((e) => e.id !== productId));
+    const addToCarts = (items) => updateCart(items);
+    const customerModel = (val) => setModalShowCustomer(val);
 
-    //product details model onChange
-    const openProductDetailModal = () => {
-        setIsOpenCartItemUpdateModel(!isOpenCartItemUpdateModel);
-    };
+    const preparePrintData = () => ({
+        products: updateProducts,
+        discount: cartItemValue.discount || 0,
+        tax: cartItemValue.tax || 0,
+        cartItemPrint: cartItemValue,
+        taxTotal,
+        grandTotal,
+        shipping: cartItemValue.shipping,
+        subTotal,
+        frontSetting,
+        customer_name: selectedCustomerOption,
+        customer: customers && customers.find(c => c.id === (selectedCustomerOption && (selectedCustomerOption.value || (selectedCustomerOption[0] && selectedCustomerOption[0].value)))),
+        settings,
+        note: cashPaymentValue.notes,
+        changeReturn,
+        payment_status: cashPaymentValue.payment_status,
+    });
 
-    //product details model updated value
-    const onClickUpdateItemInCart = (item) => {
-        setProduct(item);
-        setIsOpenCartItemUpdateModel(true);
-    };
+    const prepareData = (products) => ({
+        date: moment(new Date()).format("YYYY-MM-DD"),
+        customer_id: selectedCustomerOption && selectedCustomerOption[0] ? selectedCustomerOption[0].value : selectedCustomerOption && selectedCustomerOption.value,
+        warehouse_id: selectedOption && selectedOption[0] ? selectedOption[0].value : selectedOption && selectedOption.value,
+        sale_items: products,
+        grand_total: grandTotal,
+        ...(cashPaymentValue?.payment_status?.value === 1 ? { payment_type: paymentValue?.payment_type?.value } : {}),
+        discount: cartItemValue.discount,
+        point_discount: cartItemValue.point_discount,
+        redeem_points: cartItemValue.redeem_points,
+        shipping: cartItemValue.shipping,
+        tax_rate: cartItemValue.tax,
+        note: cashPaymentValue.notes,
+        status: 1,
+        hold_ref_no,
+        payment_status: cashPaymentValue?.payment_status?.value,
+    });
 
-    const onProductUpdateInCart = () => {
-        const localCart = updateProducts.slice();
-        updateCart(localCart);
-    };
-
-    //updated Qty function
-    const updatedQty = (qty) => {
-        setQuantity(qty);
-    };
-
-    const updateCart = (cartProducts) => {
-        setUpdateProducts(cartProducts);
-    };
-
-    //cart item delete
-    const onDeleteCartItem = (productId) => {
-        const existingCart = updateProducts.filter((e) => e.id !== productId);
-        updateCart(existingCart);
-    };
-
-    //product add to cart function
-    const addToCarts = (items) => {
-        updateCart(items);
-    };
-
-    // create customer model
-    const customerModel = (val) => {
-        setModalShowCustomer(val);
-    };
-
-    //prepare data for print Model
-    const preparePrintData = () => {
-        const formValue = {
-            products: updateProducts,
-            discount: cartItemValue.discount ? cartItemValue.discount : 0,
-            tax: cartItemValue.tax ? cartItemValue.tax : 0,
-            cartItemPrint: cartItemValue,
-            taxTotal: taxTotal,
-            grandTotal: grandTotal,
-            shipping: cartItemValue.shipping,
-            subTotal: subTotal,
-            frontSetting: frontSetting,
-            customer_name: selectedCustomerOption,
-            customer: customers && customers.find(c => c.id === (selectedCustomerOption && (selectedCustomerOption.value || (selectedCustomerOption[0] && selectedCustomerOption[0].value)))),
-            settings: settings,
-            note: cashPaymentValue.notes,
-            changeReturn,
-            payment_status: cashPaymentValue.payment_status,
-        };
-        return formValue;
-    };
-
-    //prepare data for payment api
-    const prepareData = (updateProducts) => {
-        const formValue = {
-            date: moment(new Date()).format("YYYY-MM-DD"),
-            customer_id:
-                selectedCustomerOption && selectedCustomerOption[0]
-                    ? selectedCustomerOption[0].value
-                    : selectedCustomerOption && selectedCustomerOption.value,
-            warehouse_id:
-                selectedOption && selectedOption[0]
-                    ? selectedOption[0].value
-                    : selectedOption && selectedOption.value,
-            sale_items: updateProducts,
-            grand_total: grandTotal,
-            ...(cashPaymentValue?.payment_status?.value === 1
-                ? { payment_type: paymentValue?.payment_type?.value }
-                : {}),
-            discount: cartItemValue.discount,
-            point_discount: cartItemValue.point_discount,
-            redeem_points: cartItemValue.redeem_points,
-            shipping: cartItemValue.shipping,
-            tax_rate: cartItemValue.tax,
-            note: cashPaymentValue.notes,
-            status: 1,
-            hold_ref_no: hold_ref_no,
-            payment_status: cashPaymentValue?.payment_status?.value,
-        };
-        return formValue;
-    };
-
-    //cash payment method
     const onCashPayment = (event, printSlip = false) => {
         event.preventDefault();
-        const valid = handleValidation();
-        if (valid) {
-            posCashPaymentAction(
-                prepareData(updateProducts),
-                setUpdateProducts,
-                setModalShowPaymentSlip,
-                posAllProduct,
-                {
-                    brandId,
-                    categoryId,
-                    selectedOption,
-                }, printSlip
-            );
-            // setModalShowPaymentSlip(true);
+        if (handleValidation()) {
+            posCashPaymentAction(prepareData(updateProducts), setUpdateProducts, setModalShowPaymentSlip, posAllProduct, { brandId, categoryId, selectedOption }, printSlip);
             setCashPayment(false);
             setPaymentPrint(preparePrintData());
-            setCartItemValue({
-                discount_type: discountType.FIXED,
-                discount_value: 0,
-                discount: 0,
-                tax: 0,
-                shipping: 0,
-                point_discount: 0,
-                redeem_points: 0,
-            });
-            setCashPaymentValue({
-                notes: "",
-                payment_status: {
-                    label: getFormattedMessage(
-                        "dashboard.recentSales.paid.label"
-                    ),
-                    value: 1,
-                },
-            });
+            setCartItemValue({ discount_type: discountType.FIXED, discount_value: 0, discount: 0, tax: 0, shipping: 0, point_discount: 0, redeem_points: 0 });
+            setCashPaymentValue({ notes: "", payment_status: { label: getFormattedMessage("dashboard.recentSales.paid.label"), value: 1 } });
             setCartProductIds("");
         }
     };
 
-    const loadUserNameSection = () => {
-        const firstName = userProfile?.attributes?.first_name || '';
-        const lastName = userProfile?.attributes?.last_name || '';
+    const printPaymentReceiptPdf = () => document.getElementById("printReceipt").click();
+    const printRegisterDetails = () => document.getElementById("printRegisterDetailsId").click();
 
-        console.log(firstName);
-
-        return (
-            <div className="d-none" id="user-name-print">
-                <h4>
-                    User Name: {firstName} {lastName}
-                </h4>
-            </div>
-        );
-    };
-
-    const printPaymentReceiptPdf = () => {
-        document.getElementById("printReceipt").click();
-    };
-
-    const printRegisterDetails = () => {
-        document.getElementById("printRegisterDetailsId").click();
-    };
-
-    const handlePrint = useReactToPrint({
-        content: () => componentRef.current,
-    });
-
-    const handleRegisterDetailsPrint = useReactToPrint({
-        content: () => registerDetailsRef.current,
-    });
-
-    //payment print
-    const loadPrintBlock = () => {
-        return (
-            <div className="d-none">
-                <button id="printReceipt" onClick={handlePrint}>
-                    Print this out!
-                </button>
-                <PrintData
-                    ref={componentRef}
-                    paymentType={paymentValue.payment_type.label}
-                    allConfigData={allConfigData}
-                    updateProducts={paymentPrint}
-                />
-            </div>
-        );
-    };
-
-
-    const loadRegisterDetailsPrint = () => {
-        return (
-            <div className="d-none">
-                <button
-                    id="printRegisterDetailsId"
-                    onClick={handleRegisterDetailsPrint}
-                >
-                    Print this out!
-                </button>
-                <PrintRegisterDetailsData
-                    ref={registerDetailsRef}
-                    allConfigData={allConfigData}
-                    frontSetting={frontSetting}
-                    posAllTodaySaleOverAllReport={posAllTodaySaleOverAllReport}
-                    updateProducts={paymentPrint}
-                    closeRegisterDetails={closeRegisterDetails}
-                />
-            </div>
-        );
-    };
-
-    //payment slip
-    const loadPaymentSlip = () => {
-        return (
-            <div className="d-none">
-                <PaymentSlipModal
-                    printPaymentReceiptPdf={printPaymentReceiptPdf}
-                    setPaymentValue={setPaymentValue}
-                    setModalShowPaymentSlip={setModalShowPaymentSlip}
-                    settings={settings}
-                    frontSetting={frontSetting}
-                    modalShowPaymentSlip={modalShowPaymentSlip}
-                    allConfigData={allConfigData}
-                    paymentDetails={paymentDetails}
-                    updateProducts={paymentPrint}
-                    paymentType={paymentValue.payment_type.label}
-                    paymentTypeDefaultValue={paymentTypeDefaultValue}
-                />
-            </div>
-        );
-    };
-
-
+    const handlePrint = useReactToPrint({ content: () => componentRef.current });
+    const handleRegisterDetailsPrint = useReactToPrint({ content: () => registerDetailsRef.current });
 
     const [isDetails, setIsDetails] = useState(null);
     const [lgShow, setLgShow] = useState(false);
     const [holdShow, setHoldShow] = useState(false);
 
-    const onClickDetailsModel = (isDetails = null) => {
-        setLgShow(true);
-    };
-
-    const onClickHoldModel = (isDetails = null) => {
-        setHoldShow(true);
-    };
+    const onClickDetailsModel = () => setLgShow(true);
+    const onClickHoldModel = () => setHoldShow(true);
 
     const handleClickCloseRegister = () => {
         dispatch(getAllRegisterDetailsAction());
@@ -603,137 +339,222 @@ const PosMainPage = (props) => {
 
     const handleCloseRegisterDetails = (data) => {
         if (data.cash_in_hand_while_closing.toString().trim()?.length === 0) {
-            dispatch(
-                addToast({
-                    text: getFormattedMessage(
-                        "pos.cclose-register.enter-total-cash.message"
-                    ),
-                    type: toastType.ERROR,
-                })
-            );
+            dispatch(addToast({ text: getFormattedMessage("pos.cclose-register.enter-total-cash.message"), type: toastType.ERROR }));
         } else {
             setShowCloseDetailsModal(false);
             dispatch(closeRegisterAction(data, navigate));
         }
     };
 
+    const warehouseLabel = selectedOption && (selectedOption.label || (selectedOption[0] && selectedOption[0].label));
+    const firstName = userProfile?.attributes?.first_name || "";
+    const lastName = userProfile?.attributes?.last_name || "";
+
     return (
-        <Container className="pos-screen px-3" fluid>
+        <div className="pos-screen">
             <TabTitle title="POS" />
-            {loadPrintBlock()}
-            {loadPaymentSlip()}
-            {loadRegisterDetailsPrint()}
-            <Row>
-                <TopProgressBar />
-                <Col lg={5} xxl={4} xs={6} className="pos-left-scs">
-                    <div className="d-flex flex-column h-100">
-                        <PosHeader
-                            setSelectedCustomerOption={setSelectedCustomerOption}
-                            selectedCustomerOption={selectedCustomerOption}
-                            setSelectedOption={setSelectedOption}
-                            selectedOption={selectedOption}
-                            customerModel={customerModel}
-                            updateCustomer={modalShowCustomer}
+
+            {/* Hidden print/slip blocks */}
+            <div className="d-none">
+                <button id="printReceipt" onClick={handlePrint}>Print</button>
+                <PrintData ref={componentRef} paymentType={paymentValue.payment_type.label} allConfigData={allConfigData} updateProducts={paymentPrint} />
+            </div>
+            <div className="d-none">
+                <button id="printRegisterDetailsId" onClick={handleRegisterDetailsPrint}>Print Register</button>
+                <PrintRegisterDetailsData ref={registerDetailsRef} allConfigData={allConfigData} frontSetting={frontSetting} posAllTodaySaleOverAllReport={posAllTodaySaleOverAllReport} updateProducts={paymentPrint} closeRegisterDetails={closeRegisterDetails} />
+            </div>
+            <div className="d-none">
+                <PaymentSlipModal printPaymentReceiptPdf={printPaymentReceiptPdf} setPaymentValue={setPaymentValue} setModalShowPaymentSlip={setModalShowPaymentSlip} settings={settings} frontSetting={frontSetting} modalShowPaymentSlip={modalShowPaymentSlip} allConfigData={allConfigData} paymentDetails={paymentDetails} updateProducts={paymentPrint} paymentType={paymentValue.payment_type.label} paymentTypeDefaultValue={paymentTypeDefaultValue} />
+            </div>
+
+            <TopProgressBar />
+
+            <div className="pos-main">
+                {/* ── Topbar ── */}
+                <div className="topbar">
+                    <div>
+                        <h1 className="page-title">New Sale</h1>
+                        <div className="page-sub">
+                            Cashier: <strong>{firstName} {lastName}</strong>
+                            {warehouseLabel && <> &nbsp;•&nbsp; {warehouseLabel}</>}
+                        </div>
+                    </div>
+                    <div className="topbar-actions">
+                        {warehouseLabel && (
+                            <div className="meta-pill">
+                                📍 <b>{warehouseLabel}</b>
+                            </div>
+                        )}
+                        <div className="meta-pill">
+                            🕐 <b>{moment().format("DD MMM YYYY, h:mm A")}</b>
+                        </div>
+                        <HeaderAllButton
+                            holdListData={holdListData}
+                            goToHoldScreen={onClickHoldModel}
+                            goToDetailScreen={onClickDetailsModel}
+                            onClickFullScreen={onClickFullScreen}
+                            opneCalculator={openCalculator}
+                            setOpneCalculator={setOpenCalculator}
+                            handleClickCloseRegister={handleClickCloseRegister}
                         />
-                        <div className="left-content custom-card mb-3 p-3 d-flex flex-column justify-content-between">
-                            <div className="main-table overflow-auto">
-                                <Table className="mb-0">
-                                    <thead className="position-sticky top-0">
+                    </div>
+                </div>
+
+                {/* ── 2-col layout ── */}
+                <div className="row g-3">
+
+                    {/* ── LEFT col (col-8): search + products + cart + customer + actions ── */}
+                    <div className="col-lg-8 pos-left-scs">
+
+                        {/* Add Item card */}
+                        <div className="card-modern">
+                            <div className="card-title-label">Add Item</div>
+                            <ProductSearchbar
+                                customCart={customCart}
+                                setUpdateProducts={setUpdateProducts}
+                                updateProducts={updateProducts}
+                                selectedOption={selectedOption}
+                            />
+                            <div style={{ marginTop: "14px" }}>
+                                <Category setCategory={setCategory} brandId={brandId} selectedOption={selectedOption} />
+                                <Brands categoryId={categoryId} setBrand={setBrand} selectedOption={selectedOption} />
+                            </div>
+                        </div>
+
+                        {/* Product grid */}
+                        <div className="card-modern" style={{ padding: 0, overflow: "hidden" }}>
+                            <Product
+                                cartProducts={updateProducts}
+                                updateCart={addToCarts}
+                                customCart={customCart}
+                                setCartProductIds={setCartProductIds}
+                                cartProductIds={cartProductIds}
+                                settings={settings}
+                                productMsg={productMsg}
+                                selectedOption={selectedOption}
+                            />
+                        </div>
+
+                        {/* Cart Items card */}
+                        <div className="card-modern">
+                            <div className="card-title-label">Cart Items</div>
+                            <div className="cart-table-wrap">
+                                <table className="table-modern">
+                                    <thead>
                                         <tr>
-                                            <th>
-                                                {getFormattedMessage(
-                                                    "pos-product.title"
-                                                )}
-                                            </th>
-                                            <th
-                                                className={
-                                                    updateProducts &&
-                                                        updateProducts.length
-                                                        ? "text-center"
-                                                        : ""
-                                                }
-                                            >
-                                                {getFormattedMessage(
-                                                    "pos-qty.title"
-                                                )}
-                                            </th>
-                                            <th>
-                                                {getFormattedMessage(
-                                                    "pos-price.title"
-                                                )}
-                                            </th>
-                                            <th colSpan="2">
-                                                {getFormattedMessage(
-                                                    "pos-sub-total.title"
-                                                )}
-                                            </th>
+                                            <th>{getFormattedMessage("pos-product.title")}</th>
+                                            <th>{getFormattedMessage("pos-qty.title")}</th>
+                                            <th>{getFormattedMessage("pos-price.title")}</th>
+                                            <th colSpan="2">{getFormattedMessage("pos-sub-total.title")}</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="border-0">
+                                    <tbody>
                                         {updateProducts && updateProducts.length ? (
-                                            updateProducts.map(
-                                                (updateProduct, index) => {
-                                                    return (
-                                                        <ProductCartList
-                                                            singleProduct={
-                                                                updateProduct
-                                                            }
-                                                            key={index + 1}
-                                                            index={index}
-                                                            posAllProducts={
-                                                                posAllProducts
-                                                            }
-                                                            onClickUpdateItemInCart={
-                                                                onClickUpdateItemInCart
-                                                            }
-                                                            updatedQty={updatedQty}
-                                                            updateCost={updateCost}
-                                                            onDeleteCartItem={
-                                                                onDeleteCartItem
-                                                            }
-                                                            quantity={quantity}
-                                                            frontSetting={
-                                                                frontSetting
-                                                            }
-                                                            newCost={newCost}
-                                                            allConfigData={
-                                                                allConfigData
-                                                            }
-                                                            setUpdateProducts={
-                                                                setUpdateProducts
-                                                            }
-                                                        />
-                                                    );
-                                                }
-                                            )
+                                            updateProducts.map((updateProduct, index) => (
+                                                <ProductCartList
+                                                    singleProduct={updateProduct}
+                                                    key={index + 1}
+                                                    index={index}
+                                                    posAllProducts={posAllProducts}
+                                                    onClickUpdateItemInCart={onClickUpdateItemInCart}
+                                                    updatedQty={updatedQty}
+                                                    updateCost={updateCost}
+                                                    onDeleteCartItem={onDeleteCartItem}
+                                                    quantity={quantity}
+                                                    frontSetting={frontSetting}
+                                                    newCost={newCost}
+                                                    allConfigData={allConfigData}
+                                                    setUpdateProducts={setUpdateProducts}
+                                                />
+                                            ))
                                         ) : (
                                             <tr>
-                                                <td
-                                                    colSpan={4}
-                                                    className="custom-text-center text-gray-900 fw-bold py-5"
-                                                >
-                                                    {getFormattedMessage(
-                                                        "sale.product.table.no-data.label"
-                                                    )}
+                                                <td colSpan={5} style={{ padding: 0, border: "none" }}>
+                                                    <div className="empty-state">
+                                                        <span className="emoji">🛍️</span>
+                                                        {getFormattedMessage("sale.product.table.no-data.label")}
+                                                        <br />
+                                                        <small>Scan a barcode or search above to begin</small>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         )}
                                     </tbody>
-                                </Table>
+                                </table>
                             </div>
-                            <div>
-                                <CartItemMainCalculation
-                                    totalQty={totalQty}
-                                    subTotal={subTotal}
-                                    grandTotal={grandTotal}
-                                    cartItemValue={cartItemValue}
-                                    onChangeCart={onChangeCart}
-                                    allConfigData={allConfigData}
-                                    frontSetting={frontSetting}
-                                    onChangeTaxCart={onChangeTaxCart}
-                                    selectedOption={selectedOption}
-                                    customer={customers && customers.find(c => c.id === (selectedCustomerOption && (selectedCustomerOption.value || (selectedCustomerOption[0] && selectedCustomerOption[0].value))))}
-                                />
+                        </div>
+
+                        {/* Customer card */}
+                        <div className="card-modern">
+                            <div className="card-title-label">Customer</div>
+                            <PosHeader
+                                setSelectedCustomerOption={setSelectedCustomerOption}
+                                selectedCustomerOption={selectedCustomerOption}
+                                setSelectedOption={setSelectedOption}
+                                selectedOption={selectedOption}
+                                customerModel={customerModel}
+                                updateCustomer={modalShowCustomer}
+                            />
+                        </div>
+
+                        {/* Quick-action grid */}
+                        <div className="action-grid">
+                            <button className="btn-modern btn-ghost" onClick={onClickHoldModel}>
+                                📂 Hold List
+                            </button>
+                            <button className="btn-modern btn-ghost" onClick={onClickDetailsModel}>
+                                🖨️ Register
+                            </button>
+                            <button className="btn-modern btn-ghost" onClick={handleClickCloseRegister}>
+                                🔒 Close
+                            </button>
+                            <button className="btn-modern btn-ghost" onClick={() => setModalShowCustomer(true)}>
+                                👤 Customer
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* ── RIGHT col (col-4): order summary + payment ── */}
+                    <div className="col-lg-4 pos-right-scs">
+                        <div className="card-modern">
+                            <div className="card-title-label">Order Summary</div>
+
+                            <CartItemMainCalculation
+                                totalQty={totalQty}
+                                subTotal={subTotal}
+                                grandTotal={grandTotal}
+                                cartItemValue={cartItemValue}
+                                onChangeCart={onChangeCart}
+                                allConfigData={allConfigData}
+                                frontSetting={frontSetting}
+                                onChangeTaxCart={onChangeTaxCart}
+                                selectedOption={selectedOption}
+                                customer={customers && customers.find(c => c.id === (selectedCustomerOption && (selectedCustomerOption.value || (selectedCustomerOption[0] && selectedCustomerOption[0].value))))}
+                            />
+
+                            <InlinePaymentPanel
+                                grandTotal={grandTotal}
+                                totalQty={totalQty}
+                                subTotal={subTotal}
+                                taxTotal={taxTotal}
+                                cartItemValue={cartItemValue}
+                                settings={settings}
+                                allConfigData={allConfigData}
+                                frontSetting={frontSetting}
+                                cashPaymentValue={cashPaymentValue}
+                                onChangeInput={onChangeInput}
+                                onPaymentStatusChange={onPaymentStatusChange}
+                                onPaymentTypeChange={onPaymentTypeChange}
+                                onCashPayment={onCashPayment}
+                                onChangeReturnChange={onChangeReturnChange}
+                                errors={errors}
+                                paymentTypeDefaultValue={paymentTypeDefaultValue}
+                                paymentTypeFilterOptions={paymentTypeFilterOptions}
+                                updateProducts={updateProducts}
+                            />
+
+                            {/* Hold + Reset buttons */}
+                            <div style={{ marginTop: "12px" }}>
                                 <PaymentButton
                                     updateProducts={updateProducts}
                                     updateCart={addToCarts}
@@ -752,57 +573,10 @@ const PosMainPage = (props) => {
                             </div>
                         </div>
                     </div>
-                </Col>
-                <Col lg={7} xxl={8} xs={6} className="ps-lg-0 pos-right-scs">
-                    <div className="right-content mb-3 d-flex flex-column h-100">
-                        <div className="d-sm-flex align-items-center flex-xxl-nowrap flex-wrap">
-                            <ProductSearchbar
-                                customCart={customCart}
-                                setUpdateProducts={setUpdateProducts}
-                                updateProducts={updateProducts}
-                                selectedOption={selectedOption}
-                            // handleOnSelect={handleOnSelect} handleOnSearch={handleOnSearch}
-                            // searchString={searchString}
-                            />
-                            <HeaderAllButton
-                                holdListData={holdListData}
-                                goToHoldScreen={onClickHoldModel}
-                                goToDetailScreen={onClickDetailsModel}
-                                onClickFullScreen={onClickFullScreen}
-                                opneCalculator={openCalculator}
-                                setOpneCalculator={setOpenCalculator}
-                                handleClickCloseRegister={
-                                    handleClickCloseRegister
-                                }
-                            />
-                        </div>
-                        <div className="custom-card h-100 mb-3">
-                            <div className="p-3">
-                                <Category
-                                    setCategory={setCategory}
-                                    brandId={brandId}
-                                    selectedOption={selectedOption}
-                                />
-                                <Brands
-                                    categoryId={categoryId}
-                                    setBrand={setBrand}
-                                    selectedOption={selectedOption}
-                                />
-                            </div>
-                            <Product
-                                cartProducts={updateProducts}
-                                updateCart={addToCarts}
-                                customCart={customCart}
-                                setCartProductIds={setCartProductIds}
-                                cartProductIds={cartProductIds}
-                                settings={settings}
-                                productMsg={productMsg}
-                                selectedOption={selectedOption}
-                            />
-                        </div>
-                    </div>
-                </Col>
-            </Row>
+                </div>
+            </div>
+
+            {/* Modals */}
             {isOpenCartItemUpdateModel && (
                 <ProductDetailsModel
                     openProductDetailModal={openProductDetailModal}
@@ -838,12 +612,7 @@ const PosMainPage = (props) => {
                 />
             )}
             {lgShow && (
-                <RegisterDetailsModel
-                    printRegisterDetails={printRegisterDetails}
-                    frontSetting={frontSetting}
-                    lgShow={lgShow}
-                    setLgShow={setLgShow}
-                />
+                <RegisterDetailsModel printRegisterDetails={printRegisterDetails} frontSetting={frontSetting} lgShow={lgShow} setLgShow={setLgShow} />
             )}
             {holdShow && (
                 <HoldListModal
@@ -864,32 +633,22 @@ const PosMainPage = (props) => {
                 />
             )}
             {modalShowCustomer && (
-                <CustomerForm
-                    show={modalShowCustomer}
-                    hide={setModalShowCustomer}
-                />
+                <CustomerForm show={modalShowCustomer} hide={setModalShowCustomer} />
             )}
             <PosCloseRegisterDetailsModel
                 showCloseDetailsModal={showCloseDetailsModal}
                 handleCloseRegisterDetails={handleCloseRegisterDetails}
                 setShowCloseDetailsModal={setShowCloseDetailsModal}
             />
-            {allConfigData?.permissions?.length === 1 && <PosRegisterModel showPosRegisterModel={showPosRegisterModel} isCloseButton={false} onClickshowPosRegisterModel={() => setShowPosRegisterModel(false)} />}
-        </Container>
+            {allConfigData?.permissions?.length === 1 && (
+                <PosRegisterModel showPosRegisterModel={showPosRegisterModel} isCloseButton={false} onClickshowPosRegisterModel={() => setShowPosRegisterModel(false)} />
+            )}
+        </div>
     );
 };
 
 const mapStateToProps = (state) => {
-    const {
-        posAllProducts,
-        frontSetting,
-        settings,
-        cashPayment,
-        allConfigData,
-        posAllTodaySaleOverAllReport,
-        holdListData,
-        customers,
-    } = state;
+    const { posAllProducts, frontSetting, settings, cashPayment, allConfigData, posAllTodaySaleOverAllReport, holdListData, customers } = state;
     return {
         holdListData,
         posAllProducts,
