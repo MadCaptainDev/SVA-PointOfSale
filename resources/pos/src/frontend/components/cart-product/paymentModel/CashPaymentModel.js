@@ -60,6 +60,29 @@ const CashPaymentModel = (props) => {
         }
     );
 
+    const handleSubmitAndPrint = (event) => {
+        if (event && event.preventDefault) event.preventDefault();
+        if (cashPaymentValue.received_amount !== undefined) {
+            if (
+                parseFloat(cashPaymentValue.received_amount) <
+                parseFloat(grandTotal)
+            ) {
+                dispatch(
+                    addToast({
+                        text: getFormattedMessage(
+                            "purchase.less.recieving.ammout.error"
+                        ),
+                        type: toastType.ERROR,
+                    })
+                );
+            } else {
+                onCashPayment(event, true);
+            }
+        } else {
+            onCashPayment(event, true);
+        }
+    };
+
     return (
         <Modal
             show={cashPayment}
@@ -90,6 +113,11 @@ const CashPaymentModel = (props) => {
                                     type="text"
                                     min={0}
                                     onKeyPress={(event) => numFloatValidate(event)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            handleSubmitAndPrint(e);
+                                        }
+                                    }}
                                     name="received_amount"
                                     autoComplete="off"
                                     className="form-control-solid"
@@ -345,8 +373,8 @@ const CashPaymentModel = (props) => {
                     onClick={(event) => {
                         if (cashPaymentValue.received_amount !== undefined) {
                             if (
-                                parseFloat(cashPaymentValue.received_amount) <
-                                parseFloat(grandTotal)
+                                parseInt(cashPaymentValue.received_amount) <
+                                parseInt(grandTotal)
                             ) {
                                 dispatch(
                                     addToast({
@@ -369,27 +397,7 @@ const CashPaymentModel = (props) => {
                 <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={(event) => {
-                        if (cashPaymentValue.received_amount !== undefined) {
-                            if (
-                                parseFloat(cashPaymentValue.received_amount) <
-                                parseFloat(grandTotal)
-                            ) {
-                                dispatch(
-                                    addToast({
-                                        text: getFormattedMessage(
-                                            "purchase.less.recieving.ammout.error"
-                                        ),
-                                        type: toastType.ERROR,
-                                    })
-                                );
-                            } else {
-                                onCashPayment(event, true);
-                            }
-                        } else {
-                            onCashPayment(event, true);
-                        }
-                    }}
+                    onClick={handleSubmitAndPrint}
                 >
                     {getFormattedMessage("globally.submit-and-print-button")}
                 </button>

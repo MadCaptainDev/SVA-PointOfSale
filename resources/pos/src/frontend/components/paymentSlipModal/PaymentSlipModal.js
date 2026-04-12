@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Modal, Table, Image } from "react-bootstrap";
 import { calculateProductCost } from "../../shared/SharedMethod";
 import {
@@ -26,6 +26,23 @@ const PaymentSlipModal = (props) => {
         updateProducts.settings &&
         updateProducts.settings.attributes &&
         updateProducts.settings.attributes.currency_symbol;
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "Enter" && modalShowPaymentSlip) {
+                e.preventDefault();
+                printPaymentReceiptPdf();
+            }
+        };
+
+        if (modalShowPaymentSlip) {
+            window.addEventListener("keydown", handleKeyDown);
+        }
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [modalShowPaymentSlip, printPaymentReceiptPdf]);
 
     return (
         <Modal

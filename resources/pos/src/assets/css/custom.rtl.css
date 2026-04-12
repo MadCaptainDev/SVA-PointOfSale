@@ -2230,6 +2230,20 @@ div .rdt_Pagination div:first-of-type svg {
   align-items: center;
   justify-content: center;
 }
+.toast-card__icon--warning {
+  color: #FFFFFF;
+  background-color: #f0ad4e;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stock-exceeded-row {
+  background-color: rgba(220, 53, 69, 0.08) !important;
+  border-right: 3px solid #dc3545;
+}
 .toast-card__icon svg {
   padding: 5px;
   font-size: 10px;
