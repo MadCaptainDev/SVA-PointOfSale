@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Form, InputGroup, FormControl } from "react-bootstrap-v5";
+import { InputGroup, FormControl } from "react-bootstrap-v5";
 import { useDispatch } from "react-redux";
 import { addToast } from "../../../store/action/toastAction";
 import {
     currencySymbolHandling,
     getFormattedMessage,
     getFormattedOptions,
-    numFloatValidate,
+    placeholderText,
 } from "../../../shared/sharedMethod";
-import { paymentMethodOptions, salePaymentStatusOptions, toastType } from "../../../constants";
+import { salePaymentStatusOptions, toastType } from "../../../constants";
 import ReactSelect from "../../../shared/select/reactSelect";
 
 const InlinePaymentPanel = (props) => {
@@ -36,10 +36,12 @@ const InlinePaymentPanel = (props) => {
     const dispatch = useDispatch();
     const [summation, setSummation] = useState(0);
 
+    const symbol = frontSetting.value && frontSetting.value.currency_symbol;
+
     useEffect(() => {
         const received = cashPaymentValue.received_amount;
         if (received !== undefined) {
-            setSummation(Number(received) - Number(grandTotal));
+            setSummation(parseFloat(received) - parseFloat(grandTotal));
         } else {
             setSummation(0);
         }
@@ -55,7 +57,7 @@ const InlinePaymentPanel = (props) => {
         label: option.name,
     }));
 
-    const handlePay = (e, print = true) => {
+    const handlePay = (e) => {
         if (e && e.preventDefault) e.preventDefault();
         if (!updateProducts || updateProducts.length === 0) {
             dispatch(addToast({
@@ -66,7 +68,7 @@ const InlinePaymentPanel = (props) => {
         }
         if (
             cashPaymentValue.received_amount !== undefined &&
-            parseInt(cashPaymentValue.received_amount) < parseInt(grandTotal)
+            parseFloat(cashPaymentValue.received_amount) < parseFloat(grandTotal)
         ) {
             dispatch(addToast({
                 text: getFormattedMessage("purchase.less.recieving.ammout.error"),
@@ -74,102 +76,106 @@ const InlinePaymentPanel = (props) => {
             }));
             return;
         }
-        onCashPayment(e, print);
+        onCashPayment(e);
     };
 
-    const currSymbol = settings.attributes && settings.attributes.currency_symbol;
+    const tenderAmount = currencySymbolHandling(
+        allConfigData, symbol,
+        cashPaymentValue.received_amount ? parseFloat(cashPaymentValue.received_amount).toFixed(2) : "0.00"
+    );
+    const returnAmount = currencySymbolHandling(
+        allConfigData, symbol,
+        summation ? Math.abs(summation).toFixed(2) : "0.00"
+    );
 
     return (
-        <div className="total-card bg-gradient-brand rounded-4 p-4 mt-2 shadow-sm">
-            <div className="text-uppercase small fw-semibold text-white-50 mb-1" style={{ letterSpacing: '1px' }}>Net Payable</div>
-            <div className="fs-1 fw-bold mb-3 text-white">
-                {currencySymbolHandling(allConfigData, currSymbol, grandTotal || "0.00")}
+        <div className="total-card">
+            <div className="tc-label">Net Payable</div>
+            <div className="tc-amount">
+                {currencySymbolHandling(allConfigData, symbol, grandTotal || "0.00")}
             </div>
 
-            <div className="d-flex flex-column gap-3 pt-2 border-top border-white border-opacity-25">
-                {/* Payment Status Dropdown */}
-                <div className="bg-white rounded-3 shadow-sm">
+            <div className="mini-totals">
+                <div>
+                    <div className="mt-lbl">Tender</div>
+                    <div className="mt-val">{tenderAmount}</div>
+                </div>
+                <div>
+                    <div className="mt-lbl">{summation < 0 ? "Due" : "Return"}</div>
+                    <div className="mt-val" style={{ color: summation < 0 ? "#fbbf24" : "inherit" }}>
+                        {returnAmount}
+                    </div>
+                </div>
+            </div>
+
+            {/* Payment Status */}
+            <div className="mb-3">
+                <label>{getFormattedMessage("dashboard.recentSales.paymentStatus.label")}</label>
+                <ReactSelect
+                    multiLanguageOption={paymentStatusFilterOptions}
+                    onChange={onPaymentStatusChange}
+                    name="payment_status"
+                    value={cashPaymentValue.payment_status}
+                    defaultValue={paymentStatusDefaultValue[1]}
+                    placeholder={placeholderText("pos.payment-status.label")}
+                />
+            </div>
+
+            {/* Payment Type — only when paid */}
+            {cashPaymentValue?.payment_status?.value === 1 && (
+                <div className="mb-3">
+                    <label>{getFormattedMessage("select.payment-type.label")}</label>
                     <ReactSelect
-                        multiLanguageOption={paymentStatusFilterOptions}
-                        onChange={onPaymentStatusChange}
-                        name="payment_status"
-                        title={getFormattedMessage("dashboard.recentSales.paymentStatus.label")}
-                        value={cashPaymentValue.payment_status}
-                        defaultValue={paymentStatusDefaultValue[1]}
-                        placeholder="Payment Status"
+                        multiLanguageOption={paymentTypeFilterOptions}
+                        onChange={onPaymentTypeChange}
+                        name="payment_type"
+                        isRequired
+                        defaultValue={paymentTypeDefaultValue?.[0]}
+                        placeholder={placeholderText("pos.payment-type.label")}
                     />
                 </div>
+            )}
 
-                {/* Payment Type Dropdown (Shown only when status is Paid) */}
-                {cashPaymentValue?.payment_status?.value === 1 && (
-                    <div className="bg-white rounded-3 shadow-sm">
-                        <ReactSelect
-                            multiLanguageOption={paymentTypeFilterOptions}
-                            onChange={onPaymentTypeChange}
-                            name="payment_type"
-                            isRequired
-                            defaultValue={paymentTypeDefaultValue?.[0]}
-                            placeholder={getFormattedMessage("select.payment-type.label")}
-                        />
-                    </div>
-                )}
-
-                {/* Received Amount Input */}
-                <div>
-                     <div className="text-white-50 small mb-1">{getFormattedMessage("pos-received-amount.title")}</div>
-                     <InputGroup className="bg-white rounded-3 overflow-hidden shadow-sm">
-                         <InputGroup.Text className="bg-transparent border-0 text-muted-custom fw-bold fs-5 px-3">
-                             {frontSetting?.value?.currency_symbol || currSymbol}
-                         </InputGroup.Text>
-                         <FormControl
-                             type="text"
-                             name="received_amount"
-                             autoComplete="off"
-                             className="border-0 shadow-none fs-5 fw-bold py-2"
-                             defaultValue={grandTotal}
-                             onKeyPress={(e) => numFloatValidate(e)}
-                             onKeyDown={(e) => {
-                                 if (e.key === "Enter") {
-                                     handlePay(e, true);
-                                 }
-                             }}
-                             onChange={(e) => onChangeInput(e)}
-                             placeholder="0.00"
-                         />
-                     </InputGroup>
-                </div>
-
-                {/* Change Return Label */}
-                <div className={`d-flex justify-content-between align-items-center py-2 ${summation < 0 ? 'text-warning' : 'text-white'}`}>
-                    <span className="small fw-semibold">
-                        <i className="bi bi-arrow-return-left me-2" />
-                        {getFormattedMessage("pos.change-return.label")}
-                    </span>
-                    <span className="fs-5 fw-bold">
-                        {currencySymbolHandling(allConfigData, currSymbol, Math.abs(summation).toFixed(2))}
-                        {summation < 0 ? <span className="badge bg-warning text-dark ms-2">DUE</span> : ""}
-                    </span>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="d-flex gap-2 mt-2">
-                    <button
-                        type="button"
-                        className="btn btn-light rounded-3 py-2 w-100 fw-bold d-flex align-items-center justify-content-center gap-2 text-dark shadow-sm"
-                        onClick={(e) => handlePay(e, true)}
-                    >
-                        <i className="bi bi-printer-fill text-primary" /> Pay & Print
-                    </button>
-                    <button
-                        type="button"
-                        className="btn rounded-3 py-2 w-100 fw-bold d-flex align-items-center justify-content-center gap-2 text-white border-white border-opacity-50 hover-bg-white hover-opacity-10"
-                        style={{ border: '1px solid rgba(255,255,255,0.5)', background: 'transparent' }}
-                        onClick={(e) => handlePay(e, false)}
-                    >
-                        <i className="bi bi-check-lg" /> Save Only
-                    </button>
-                </div>
+            {/* Received Amount */}
+            <div className="mb-3">
+                <label>{getFormattedMessage("pos-received-amount.title")}</label>
+                <InputGroup>
+                    <InputGroup.Text>{symbol || "$"}</InputGroup.Text>
+                    <FormControl
+                        type="text"
+                        name="received_amount"
+                        autoComplete="off"
+                        placeholder="0.00"
+                        onChange={onChangeInput}
+                        value={cashPaymentValue.received_amount || ""}
+                    />
+                </InputGroup>
             </div>
+
+            {/* Notes */}
+            <div className="mb-3">
+                <label>{getFormattedMessage("pos.payment-note.label") || "Note (optional)"}</label>
+                <FormControl
+                    as="textarea"
+                    rows={2}
+                    name="notes"
+                    placeholder="Add a note..."
+                    onChange={onChangeInput}
+                    value={cashPaymentValue.notes || ""}
+                    maxLength={100}
+                />
+                {errors.notes && <small style={{ color: "#ef4444" }}>{errors.notes}</small>}
+            </div>
+
+            {/* Complete Sale */}
+            <button
+                type="button"
+                className="btn-modern btn-success-m w-100 justify-content-center"
+                style={{ padding: "14px", fontSize: "15px" }}
+                onClick={handlePay}
+            >
+                ✓ {getFormattedMessage("pos-pay-now.btn") || "Complete Sale"}
+            </button>
         </div>
     );
 };
