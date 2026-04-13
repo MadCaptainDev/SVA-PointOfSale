@@ -325,6 +325,7 @@ const PosMainPage = (props) => {
     const handlePrint = useReactToPrint({ content: () => componentRef.current });
     const handleRegisterDetailsPrint = useReactToPrint({ content: () => registerDetailsRef.current });
 
+    const [showBrowse, setShowBrowse] = useState(true);
     const [isDetails, setIsDetails] = useState(null);
     const [lgShow, setLgShow] = useState(false);
     const [holdShow, setHoldShow] = useState(false);
@@ -354,7 +355,7 @@ const PosMainPage = (props) => {
         <div className="pos-screen">
             <TabTitle title="POS" />
 
-            {/* Hidden print/slip blocks */}
+            {/* Hidden print blocks */}
             <div className="d-none">
                 <button id="printReceipt" onClick={handlePrint}>Print</button>
                 <PrintData ref={componentRef} paymentType={paymentValue.payment_type.label} allConfigData={allConfigData} updateProducts={paymentPrint} />
@@ -363,9 +364,8 @@ const PosMainPage = (props) => {
                 <button id="printRegisterDetailsId" onClick={handleRegisterDetailsPrint}>Print Register</button>
                 <PrintRegisterDetailsData ref={registerDetailsRef} allConfigData={allConfigData} frontSetting={frontSetting} posAllTodaySaleOverAllReport={posAllTodaySaleOverAllReport} updateProducts={paymentPrint} closeRegisterDetails={closeRegisterDetails} />
             </div>
-            <div className="d-none">
-                <PaymentSlipModal printPaymentReceiptPdf={printPaymentReceiptPdf} setPaymentValue={setPaymentValue} setModalShowPaymentSlip={setModalShowPaymentSlip} settings={settings} frontSetting={frontSetting} modalShowPaymentSlip={modalShowPaymentSlip} allConfigData={allConfigData} paymentDetails={paymentDetails} updateProducts={paymentPrint} paymentType={paymentValue.payment_type.label} paymentTypeDefaultValue={paymentTypeDefaultValue} />
-            </div>
+            {/* Payment slip modal — rendered outside d-none so it shows correctly */}
+            <PaymentSlipModal printPaymentReceiptPdf={printPaymentReceiptPdf} setPaymentValue={setPaymentValue} setModalShowPaymentSlip={setModalShowPaymentSlip} settings={settings} frontSetting={frontSetting} modalShowPaymentSlip={modalShowPaymentSlip} allConfigData={allConfigData} paymentDetails={paymentDetails} updateProducts={paymentPrint} paymentType={paymentValue.payment_type.label} paymentTypeDefaultValue={paymentTypeDefaultValue} />
 
             <TopProgressBar />
 
@@ -408,32 +408,46 @@ const PosMainPage = (props) => {
 
                         {/* Add Item card */}
                         <div className="card-modern">
-                            <div className="card-title-label">Add Item</div>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+                                <div className="card-title-label" style={{ marginBottom: 0 }}>Add Item</div>
+                                <button
+                                    className="btn-modern btn-ghost"
+                                    style={{ padding: "6px 12px !important", fontSize: "12px !important" }}
+                                    onClick={() => setShowBrowse(v => !v)}
+                                    title={showBrowse ? "Hide product browser" : "Show product browser"}
+                                >
+                                    {showBrowse ? "🙈 Hide Browse" : "🔍 Browse"}
+                                </button>
+                            </div>
                             <ProductSearchbar
                                 customCart={customCart}
                                 setUpdateProducts={setUpdateProducts}
                                 updateProducts={updateProducts}
                                 selectedOption={selectedOption}
                             />
-                            <div style={{ marginTop: "14px" }}>
-                                <Category setCategory={setCategory} brandId={brandId} selectedOption={selectedOption} />
-                                <Brands categoryId={categoryId} setBrand={setBrand} selectedOption={selectedOption} />
-                            </div>
+                            {showBrowse && (
+                                <div style={{ marginTop: "14px" }}>
+                                    <Category setCategory={setCategory} brandId={brandId} selectedOption={selectedOption} />
+                                    <Brands categoryId={categoryId} setBrand={setBrand} selectedOption={selectedOption} />
+                                </div>
+                            )}
                         </div>
 
-                        {/* Product grid */}
-                        <div className="card-modern" style={{ padding: 0, overflow: "hidden" }}>
-                            <Product
-                                cartProducts={updateProducts}
-                                updateCart={addToCarts}
-                                customCart={customCart}
-                                setCartProductIds={setCartProductIds}
-                                cartProductIds={cartProductIds}
-                                settings={settings}
-                                productMsg={productMsg}
-                                selectedOption={selectedOption}
-                            />
-                        </div>
+                        {/* Product grid — hidden when browse is collapsed */}
+                        {showBrowse && (
+                            <div className="card-modern" style={{ padding: 0, overflow: "hidden" }}>
+                                <Product
+                                    cartProducts={updateProducts}
+                                    updateCart={addToCarts}
+                                    customCart={customCart}
+                                    setCartProductIds={setCartProductIds}
+                                    cartProductIds={cartProductIds}
+                                    settings={settings}
+                                    productMsg={productMsg}
+                                    selectedOption={selectedOption}
+                                />
+                            </div>
+                        )}
 
                         {/* Cart Items card */}
                         <div className="card-modern">

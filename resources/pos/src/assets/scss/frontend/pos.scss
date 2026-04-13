@@ -127,14 +127,41 @@
         border: 1px solid rgba(255,255,255,0.3) !important;
         color: #fff !important;
     }
-    label, .form-label { color: rgba(255,255,255,0.85) !important; font-size: 12px; margin-bottom: 4px; }
+    label, .form-label { color: rgba(255,255,255,0.9) !important; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    // React-Select control (the closed input box) — white-on-gradient
     .css-13cymwt-control, .css-t3ipsp-control {
-        background: rgba(255,255,255,0.15) !important;
-        border-color: rgba(255,255,255,0.3) !important;
+        background: rgba(255,255,255,0.18) !important;
+        border-color: rgba(255,255,255,0.35) !important;
         border-radius: 10px !important;
+        box-shadow: none !important;
     }
-    .css-1jqq78o-placeholder, .css-14el2xx-placeholder { color: rgba(255,255,255,0.6) !important; }
-    .css-qc6sy-singleValue { color: #fff !important; }
+    // Placeholder text
+    .css-1jqq78o-placeholder, .css-14el2xx-placeholder,
+    [class$="-placeholder"] { color: rgba(255,255,255,0.65) !important; }
+    // Selected value text
+    .css-qc6sy-singleValue, [class$="-singleValue"] { color: #fff !important; }
+    // Dropdown arrow & clear icons
+    .css-1okebmr-indicatorSeparator, [class$="-indicatorSeparator"] { background-color: rgba(255,255,255,0.3) !important; }
+    .css-tlfecz-indicatorContainer, .css-1gtu0rj-indicatorContainer,
+    [class$="-indicatorContainer"] svg { color: rgba(255,255,255,0.8) !important; fill: rgba(255,255,255,0.8) !important; }
+    // Dropdown MENU — always dark text on white background so options are readable
+    .css-26l3qy-menu, [class$="-menu"] {
+        background: #fff !important;
+        border-radius: 10px !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+        color: var(--text-dark) !important;
+        z-index: 9999 !important;
+    }
+    [class$="-MenuList"] { padding: 4px !important; }
+    [class$="-option"] {
+        color: var(--text-dark) !important;
+        border-radius: 8px !important;
+        font-size: 13px;
+        &:hover, &:focus { background: #f0f0ff !important; }
+        &[class*="selected"] { background: var(--brand) !important; color: #fff !important; }
+    }
+    // Input text inside the select control
+    [class$="-Input"] input { color: #fff !important; }
 }
 .mini-totals {
     display: flex;

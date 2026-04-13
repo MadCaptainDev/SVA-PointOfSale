@@ -76,7 +76,7 @@ const InlinePaymentPanel = (props) => {
             }));
             return;
         }
-        onCashPayment(e);
+        onCashPayment(e, true); // true = show print receipt slip after payment
     };
 
     const tenderAmount = currencySymbolHandling(
