@@ -11,6 +11,40 @@ import {
 import { salePaymentStatusOptions, toastType } from "../../../constants";
 import ReactSelect from "../../../shared/select/reactSelect";
 
+// Inline styles for react-select inside the gradient payment card
+const selectStylesOnGradient = {
+    control: (base) => ({
+        ...base,
+        background: 'rgba(255,255,255,0.18)',
+        border: '1px solid rgba(255,255,255,0.35)',
+        borderRadius: '10px',
+        boxShadow: 'none',
+        minHeight: '40px',
+        '&:hover': { borderColor: 'rgba(255,255,255,0.6)' },
+    }),
+    singleValue: (base) => ({ ...base, color: '#fff', fontWeight: 600 }),
+    placeholder: (base) => ({ ...base, color: 'rgba(255,255,255,0.6)' }),
+    input: (base) => ({ ...base, color: '#fff' }),
+    dropdownIndicator: (base) => ({ ...base, color: 'rgba(255,255,255,0.8)', padding: '0 8px' }),
+    indicatorSeparator: (base) => ({ ...base, background: 'rgba(255,255,255,0.3)' }),
+    menu: (base) => ({
+        ...base,
+        background: '#fff',
+        borderRadius: '10px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+        zIndex: 9999,
+    }),
+    option: (base, state) => ({
+        ...base,
+        background: state.isSelected ? '#6366f1' : state.isFocused ? '#f0f0ff' : '#fff',
+        color: state.isSelected ? '#fff' : '#1a1d29',
+        borderRadius: '6px',
+        fontSize: '13px',
+        cursor: 'pointer',
+    }),
+    menuList: (base) => ({ ...base, padding: '4px' }),
+};
+
 const InlinePaymentPanel = (props) => {
     const {
         grandTotal,
@@ -118,6 +152,7 @@ const InlinePaymentPanel = (props) => {
                     value={cashPaymentValue.payment_status}
                     defaultValue={paymentStatusDefaultValue[1]}
                     placeholder={placeholderText("pos.payment-status.label")}
+                    styles={selectStylesOnGradient}
                 />
             </div>
 
@@ -132,6 +167,7 @@ const InlinePaymentPanel = (props) => {
                         isRequired
                         defaultValue={paymentTypeDefaultValue?.[0]}
                         placeholder={placeholderText("pos.payment-type.label")}
+                        styles={selectStylesOnGradient}
                     />
                 </div>
             )}
@@ -154,7 +190,7 @@ const InlinePaymentPanel = (props) => {
 
             {/* Notes */}
             <div className="mb-3">
-                <label>{getFormattedMessage("pos.payment-note.label") || "Note (optional)"}</label>
+                <label>Note (optional)</label>
                 <FormControl
                     as="textarea"
                     rows={2}

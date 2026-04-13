@@ -10,7 +10,8 @@
         "hot": "mix watch --hot",
         "production": "mix --production",
         "rtl": "webpack --config webpack-rtl.config.js",
-        "build": "react-scripts --max_old_space_size=4096 build"
+        "build": "react-scripts --max_old_space_size=4096 build",
+        "compile-pos": "node_modules/.bin/sass resources/pos/src/assets/scss/frontend/frontend.scss resources/pos/src/assets/css/frontend.css --no-source-map --load-path node_modules"
     },
     "devDependencies": {
         "@pmmmwh/react-refresh-webpack-plugin": "^0.5.16",

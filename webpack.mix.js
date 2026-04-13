@@ -36,8 +36,5 @@ mix.js('resources/pos/src/index.js', 'public/js/app.js').version();
 mix.copyDirectory('resources/images',
     'public/images')
 
-// Compile POS frontend SCSS → CSS (pos.scss design system)
-mix.sass(
-    'resources/pos/src/assets/scss/frontend/frontend.scss',
-    'resources/pos/src/assets/css/frontend.css'
-);
+// NOTE: frontend.css is pre-compiled from SCSS and committed.
+// Run: npm run compile-pos to regenerate it after SCSS changes.
