@@ -325,7 +325,7 @@ const PosMainPage = (props) => {
     const handlePrint = useReactToPrint({ content: () => componentRef.current });
     const handleRegisterDetailsPrint = useReactToPrint({ content: () => registerDetailsRef.current });
 
-    const [showBrowse, setShowBrowse] = useState(true);
+    const [showBrowse, setShowBrowse] = useState(false); // hidden by default
     const [isDetails, setIsDetails] = useState(null);
     const [lgShow, setLgShow] = useState(false);
     const [holdShow, setHoldShow] = useState(false);
@@ -358,7 +358,7 @@ const PosMainPage = (props) => {
             {/* Hidden print blocks */}
             <div className="d-none">
                 <button id="printReceipt" onClick={handlePrint}>Print</button>
-                <PrintData ref={componentRef} paymentType={paymentValue.payment_type.label} allConfigData={allConfigData} updateProducts={paymentPrint} />
+                <PrintData ref={componentRef} paymentType={paymentValue.payment_type.label} allConfigData={allConfigData} updateProducts={paymentPrint} paymentDetails={paymentDetails} />
             </div>
             <div className="d-none">
                 <button id="printRegisterDetailsId" onClick={handleRegisterDetailsPrint}>Print Register</button>
