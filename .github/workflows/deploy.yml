@@ -1,0 +1,25 @@
+name: Deploy to Live Server
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 217.21.94.123
+          port: 65002
+          username: u512425400
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/domains/pos.svasilksandreadymades.com/public_html
+            git pull origin main
+            php artisan optimize
+            echo "Deployed at $(date)"
