@@ -200,16 +200,10 @@ const PosMainPage = (props) => {
         }
     }, [selectedOption, brandId, categoryId]);
 
-    // Auto-scroll cart table to last added item
+    // Auto-scroll cart table to bottom when a product is added
     useEffect(() => {
         if (cartTableRef.current && updateProducts && updateProducts.length > 0) {
-            const tbody = cartTableRef.current.querySelector('tbody');
-            if (tbody) {
-                const lastRow = tbody.lastElementChild;
-                if (lastRow) {
-                    lastRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }
+            cartTableRef.current.scrollTop = cartTableRef.current.scrollHeight;
         }
     }, [updateProducts]);
 
