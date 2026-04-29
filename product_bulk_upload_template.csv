@@ -1,0 +1,3 @@
+Name,Code,Category,Brand,Barcode Symbol,Cost,Price,Base Unit,Sale Unit,Purchase Unit,Stock Alert,Tax,Tax Type,Notes,HSN Code,Warehouse,Supplier,Stock Qty,Status
+Sample Product 1,SKU001,Electronics,Brand A,CODE128,100.00,150.00,Piece,Piece,Piece,10,18,Exclusive,Sample product note,64041090,Main Warehouse,Supplier A,50,Received
+Sample Product 2,SKU002,Clothing,Brand B,CODE128,200.00,350.00,Piece,Piece,Piece,5,12,Inclusive,Another sample,61051000,Branch Warehouse,Supplier B,30,Ordered

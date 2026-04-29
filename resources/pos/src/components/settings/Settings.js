@@ -82,6 +82,7 @@ const Settings = (props) => {
         point_earning_rate: "",
         point_redemption_rate: "",
         show_stock_warning: "",
+        font_size: 14,
     });
 
     const [defaultDate, setDefaultDate] = useState(null);
@@ -345,6 +346,10 @@ const Settings = (props) => {
                         settings.attributes.show_stock_warning !== "1"
                         ? false
                         : true,
+                font_size:
+                    settings.attributes && settings.attributes.font_size
+                        ? parseInt(settings.attributes.font_size)
+                        : 14,
             });
             if (
                 settings.attributes &&
@@ -617,6 +622,7 @@ const Settings = (props) => {
         formData.append("is_currency_right", data.Currency_icon_Right_side);
         formData.append("point_earning_rate", data.point_earning_rate);
         formData.append("point_redemption_rate", data.point_redemption_rate);
+        formData.append("font_size", data.font_size);
         formData.append(
             "show_stock_warning",
             data.show_stock_warning === true ? "1" : "0"
@@ -875,6 +881,26 @@ const Settings = (props) => {
                                             {errors["point_redemption_rate"]}
                                         </span>
                                     ) : null}
+                                </div>
+                                <div className="col-lg-6 mb-3">
+                                    <label className="form-label">
+                                        Font Size (Display): <span className="text-muted">{settingValue.font_size}px</span>
+                                    </label>
+                                    <Form.Range
+                                        min={10}
+                                        max={24}
+                                        step={1}
+                                        value={settingValue.font_size}
+                                        onChange={(e) =>
+                                            setSettingValue({
+                                                ...settingValue,
+                                                font_size: parseInt(e.target.value),
+                                            })
+                                        }
+                                    />
+                                    <small className="text-muted">
+                                        Adjust font size for better readability (10px - 24px)
+                                    </small>
                                 </div>
                                 <div className="col-lg-6 mb-3">
                                     <label className="form-label">

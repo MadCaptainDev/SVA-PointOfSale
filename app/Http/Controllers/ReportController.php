@@ -35,12 +35,13 @@ public function downloadAllReports()
 
         // Map filenames to controller methods
         $reports = [
-            'purchase-report.xlsx'     => [$this, 'purchaseReport'],
-            'sales-report.xlsx'        => [$this, 'salesReport'],
-            'hsn-sales-report.xlsx'    => [$this, 'hsnSalesReport'],
-            'hsn-purchase-report.xlsx' => [$this, 'hsnPurchaseReport'],
-            'sales-return-report.xlsx' => [$this, 'salesReturnReport'],
-            'gstr-summary-report.xlsx' => [$this, 'gstrSummaryReport'],
+            'purchase-report.xlsx'         => [$this, 'purchaseReport'],
+            'sales-report.xlsx'            => [$this, 'salesReport'],
+            'hsn-sales-report.xlsx'        => [$this, 'hsnSalesReport'],
+            'hsn-purchase-report.xlsx'     => [$this, 'hsnPurchaseReport'],
+            'hsn-sales-return-report.xlsx' => [$this, 'hsnSalesReturnReport'],
+            'sales-return-report.xlsx'     => [$this, 'salesReturnReport'],
+            'gstr-summary-report.xlsx'     => [$this, 'gstrSummaryReport'],
         ];
 
         foreach ($reports as $fileName => $method) {

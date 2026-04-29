@@ -103,10 +103,11 @@ class ProductImport implements ToCollection, WithChunkReading, WithStartRow, Wit
                     'order_tax' => $row[11] ?? null,
                     'tax_type' => $taxType,
                     'notes' => $row[13] ?? null,
+                    'hsn_code' => $row[14] ?? null,
                     'main_product_id' => $mainProduct->id,
-                    
-                    
-                    
+
+
+
                 ]);
                     
 
@@ -117,13 +118,13 @@ class ProductImport implements ToCollection, WithChunkReading, WithStartRow, Wit
                     $generator->getBarcode($row[1], $this->getBarcodeType($barcodeSymbol), 4, 70)
                 );
 
-                if (!empty($row[14]) && !empty($row[15]) && !empty($row[16])) {
-                    $warehouse = Warehouse::whereRaw('LOWER(name) = ?', [strtolower($row[14])])->first();
-                    $supplier = Supplier::whereRaw('LOWER(name) = ?', [strtolower($row[15])])->first();
+                if (!empty($row[15]) && !empty($row[16]) && !empty($row[17])) {
+                    $warehouse = Warehouse::whereRaw('LOWER(name) = ?', [strtolower($row[15])])->first();
+                    $supplier = Supplier::whereRaw('LOWER(name) = ?', [strtolower($row[16])])->first();
 
                     if ($warehouse && $supplier) {
-                        manageStock($warehouse->id, $product->id, $row[16]);
-                        $status = match(strtolower($row[17])) {
+                        manageStock($warehouse->id, $product->id, $row[17]);
+                        $status = match(strtolower($row[18] ?? 'pending')) {
                             'received' => 1,
                             'ordered' => 3,
                             default => 2,
@@ -148,13 +149,13 @@ class ProductImport implements ToCollection, WithChunkReading, WithStartRow, Wit
                             'discount_value' => 0,
                             'discount_amount' => 0,
                             'purchase_unit' => $product->purchase_unit,
-                            'quantity' => $row[16],
-                            'sub_total' => $product->product_cost * $row[16],
+                            'quantity' => $row[17],
+                            'sub_total' => $product->product_cost * $row[17],
                         ]);
 
                         $purchase->update([
                             'reference_code' => getSettingValue('purchase_code') . '_111' . $purchase->id,
-                            'grand_total' => $product->product_cost * $row[16],
+                            'grand_total' => $product->product_cost * $row[17],
                         ]);
                     }
                 }
@@ -201,6 +202,7 @@ class ProductImport implements ToCollection, WithChunkReading, WithStartRow, Wit
             '10' => 'nullable|numeric',
             '11' => 'nullable|numeric',
             '12' => 'required',
+            '14' => 'nullable|string|max:8',
         ];
     }
 
@@ -220,6 +222,7 @@ class ProductImport implements ToCollection, WithChunkReading, WithStartRow, Wit
             '8.required' => 'Sale Unit is required',
             '9.required' => 'Purchase Unit is required',
             '12.required' => 'Tax Type is required',
+            '14.max' => 'HSN Code must be 8 characters or less',
         ];
     }
 
