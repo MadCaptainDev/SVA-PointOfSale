@@ -74,6 +74,7 @@ const PosMainPage = (props) => {
 
     const componentRef = useRef();
     const registerDetailsRef = useRef();
+    const cartTableRef = useRef(null);
 
     const [openCalculator, setOpenCalculator] = useState(false);
     const [quantity, setQuantity] = useState(1);
@@ -198,6 +199,19 @@ const PosMainPage = (props) => {
             fetchBrandClickable(brandId, categoryId, selectedOption.value && selectedOption.value);
         }
     }, [selectedOption, brandId, categoryId]);
+
+    // Auto-scroll cart table to last added item
+    useEffect(() => {
+        if (cartTableRef.current && updateProducts && updateProducts.length > 0) {
+            const tbody = cartTableRef.current.querySelector('tbody');
+            if (tbody) {
+                const lastRow = tbody.lastElementChild;
+                if (lastRow) {
+                    lastRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+        }
+    }, [updateProducts]);
 
     const setBrand = (item) => setBrandId(item);
 
@@ -452,7 +466,7 @@ const PosMainPage = (props) => {
                         {/* Cart Items card */}
                         <div className="card-modern">
                             <div className="card-title-label">Cart Items</div>
-                            <div className="cart-table-wrap">
+                            <div className="cart-table-wrap" ref={cartTableRef} style={{ maxHeight: '400px', overflowY: 'auto' }}>
                                 <table className="table-modern">
                                     <thead>
                                         <tr>
