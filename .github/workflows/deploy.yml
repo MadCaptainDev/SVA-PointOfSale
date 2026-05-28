@@ -26,6 +26,7 @@ jobs:
             php artisan config:clear
             php artisan route:clear
             php artisan view:clear
+            php artisan migrate --force
             php artisan optimize
             php artisan view:cache
             php artisan storage:link --force
