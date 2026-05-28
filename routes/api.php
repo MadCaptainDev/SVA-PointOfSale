@@ -53,6 +53,9 @@ use App\Http\Controllers\PurchaseExportController;
 Route::get('/export-purchase-units', [PurchaseExportController::class , 'exportUnits']);
 
 Route::post('/products/import', 'App\Http\Controllers\API\ProductImportController@import');
+Route::get('/import-logs', 'App\Http\Controllers\API\ProductImportController@history');
+Route::get('/import-logs/{id}', 'App\Http\Controllers\API\ProductImportController@show');
+Route::get('/import-logs/{id}/error-report', 'App\Http\Controllers\API\ProductImportController@downloadErrorReport');
 
 //reports
 Route::get('/purchase-report', [ReportController::class , 'purchaseReport']);

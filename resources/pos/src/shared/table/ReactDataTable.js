@@ -57,6 +57,7 @@ const ReactDataTable = (props) => {
         isBrandFilter,
         brandFilterTitle,
         productCategoryFilterTitle,
+        goToImportHistory,
     } = props;
     const [perPage, setPerPages] = useState(defaultLimit);
     const [pageSize, setPageSize] = useState(Filters.OBJ.pageSize);
@@ -184,6 +185,7 @@ const ReactDataTable = (props) => {
                             onResetClick={onResetClick}
                             isExportDropdown={isExportDropdown}
                             isImportDropdown={isImportDropdown}
+                            goToImportHistory={goToImportHistory}
                             isProductCategoryFilter={isProductCategoryFilter}
                             isBrandFilter={isBrandFilter}
                             productCategory={productCategory}

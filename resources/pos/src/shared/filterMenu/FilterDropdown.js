@@ -52,6 +52,7 @@ const FilterDropdown = (props) => {
         productCategoryFilterTitle,
         fetchAllBrands,
         fetchAllProductCategories,
+        goToImportHistory,
     } = props;
 
     const dispatch = useDispatch();
@@ -484,7 +485,7 @@ const FilterDropdown = (props) => {
                             e.stopPropagation();
                         }}
                         eventkey="1"
-                        className="mb-5 p-0"
+                        className="mb-2 p-0"
                     >
                         <Button
                             variant="primary"
@@ -492,6 +493,22 @@ const FilterDropdown = (props) => {
                             onClick={goToImport}
                         >
                             {getFormattedMessage("product.import.title")}
+                        </Button>
+                    </Dropdown.Header>
+                ) : null}
+                {isImportDropdown && goToImportHistory ? (
+                    <Dropdown.Header
+                        onClick={(e) => { e.stopPropagation(); }}
+                        eventkey="2"
+                        className="mb-5 p-0"
+                    >
+                        <Button
+                            variant="outline-secondary"
+                            className="me-3 me-md-0 w-100"
+                            style={{ fontSize: 13 }}
+                            onClick={goToImportHistory}
+                        >
+                            📋 Import History
                         </Button>
                     </Dropdown.Header>
                 ) : null}

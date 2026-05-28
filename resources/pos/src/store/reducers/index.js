@@ -100,6 +100,7 @@ import posRegisterReportDetailsReducer from "./pos/posRegisterReportDetailsReduc
 import variationReducer from "./variationReducer";
 import receiptSettingsReducer from "./receiptSettingsReducer";
 import customerWithdrawalReducer from "./customerWithdrawalReducer";
+import importLogReducer from "./importLogReducer";
 
 export default combineReducers({
     loginUser: loginReducers,
@@ -203,4 +204,5 @@ export default combineReducers({
     registerReportDetails: posRegisterReportDetailsReducer,
     receiptSettings: receiptSettingsReducer,
     customerWithdrawals: customerWithdrawalReducer,
+    importLogs: importLogReducer,
 });

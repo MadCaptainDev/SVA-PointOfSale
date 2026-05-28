@@ -19,6 +19,7 @@ import ActionButton from "../../shared/action-buttons/ActionButton";
 import { fetchFrontSetting } from "../../store/action/frontSettingAction";
 import TopProgressBar from "../../shared/components/loaders/TopProgressBar";
 import ImportProductModel from "./ImportProductModel";
+import ImportHistory from "./ImportHistory";
 import { productExcelAction } from "../../store/action/productExcelAction";
 
 const Product = (props) => {
@@ -43,6 +44,8 @@ const Product = (props) => {
     const handleClose = () => {
         setimportProduct(!importProduct);
     };
+
+    const [showHistory, setShowHistory] = useState(false);
 
     const [isWarehouseValue, setIsWarehouseValue] = useState(false);
     useEffect(() => {
@@ -277,6 +280,7 @@ const Product = (props) => {
                 isExportDropdown={true}
                 isImportDropdown={true}
                 onExcelClick={onExcelClick}
+                goToImportHistory={() => setShowHistory(true)}
                 isProductCategoryFilter
                 isBrandFilter
                 brandFilterTitle={getFormattedMessage(
@@ -304,6 +308,10 @@ const Product = (props) => {
                     show={importProduct}
                 />
             )}
+            <ImportHistory
+                show={showHistory}
+                handleClose={() => setShowHistory(false)}
+            />
         </MasterLayout>
     );
 };
