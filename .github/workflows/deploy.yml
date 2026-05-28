@@ -21,5 +21,13 @@ jobs:
           script: |
             cd ~/domains/pos.svasilksandreadymades.com/public_html
             git pull origin main
+            php artisan down --retry=5
+            php artisan cache:clear
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
             php artisan optimize
+            php artisan view:cache
+            php artisan storage:link --force
+            php artisan up
             echo "Deployed at $(date)"
