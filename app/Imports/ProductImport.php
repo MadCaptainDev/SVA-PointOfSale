@@ -103,7 +103,7 @@ class ProductImport implements ToCollection, WithChunkReading, WithStartRow, Wit
                     'order_tax' => $row[11] ?? null,
                     'tax_type' => $taxType,
                     'notes' => $row[13] ?? null,
-                    'hsn_code' => $row[14] ?? null,
+                    'hsn_code' => isset($row[14]) && $row[14] !== '' ? (string)$row[14] : null,
                     'main_product_id' => $mainProduct->id,
 
 
@@ -202,7 +202,7 @@ class ProductImport implements ToCollection, WithChunkReading, WithStartRow, Wit
             '10' => 'nullable|numeric',
             '11' => 'nullable|numeric',
             '12' => 'required',
-            '14' => 'nullable|string|max:8',
+            '14' => 'nullable|max:8',
         ];
     }
 
