@@ -89,6 +89,11 @@ import RegisterReport from "./components/report/registerReport/RegisterReport";
 import Variation from "./components/variation/Variation";
 import ReceiptSettings from "./components/settings/ReceiptSettings";
 import CustomerWithdrawals from "./components/customerWithdrawal/CustomerWithdrawals";
+import Staff from "./components/staff/Staff";
+import CreateStaff from "./components/staff/CreateStaff";
+import EditStaff from "./components/staff/EditStaff";
+import StaffDetail from "./components/staff/StaffDetail";
+import StaffIncentives from "./components/staffIncentive/StaffIncentives";
 
 export const route = [
     {
@@ -181,6 +186,31 @@ export const route = [
         path: "customer-withdrawals",
         ele: <CustomerWithdrawals />,
         permission: Permissions.MANAGE_CUSTOMERS,
+    },
+    {
+        path: "staff",
+        ele: <Staff />,
+        permission: Permissions.MANAGE_STAFF,
+    },
+    {
+        path: "staff/create",
+        ele: <CreateStaff />,
+        permission: Permissions.MANAGE_STAFF,
+    },
+    {
+        path: "staff/edit/:id",
+        ele: <EditStaff />,
+        permission: Permissions.MANAGE_STAFF,
+    },
+    {
+        path: "staff/detail/:id",
+        ele: <StaffDetail />,
+        permission: Permissions.MANAGE_STAFF,
+    },
+    {
+        path: "staff-incentives",
+        ele: <StaffIncentives />,
+        permission: Permissions.MANAGE_STAFF_INCENTIVES,
     },
     {
         path: "users",

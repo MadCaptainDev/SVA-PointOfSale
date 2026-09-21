@@ -30,6 +30,9 @@ use App\Http\Controllers\API\SalesPaymentAPIController;
 use App\Http\Controllers\API\SettingAPIController;
 use App\Http\Controllers\API\SmsSettingAPIController;
 use App\Http\Controllers\API\SmsTemplateAPIController;
+use App\Http\Controllers\API\StaffAPIController;
+use App\Http\Controllers\API\StaffIncentiveEarningAPIController;
+use App\Http\Controllers\API\StaffIncentivePayoutAPIController;
 use App\Http\Controllers\API\SupplierAPIController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\UnitAPIController;
@@ -198,6 +201,18 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('users/{user}', [UserAPIController::class , 'update']);
         }
         );
+
+        // Staff management
+        Route::middleware('permission:manage_staff')->group(function () {
+            Route::resource('staff', StaffAPIController::class);
+            Route::post('staff/{staff}', [StaffAPIController::class, 'update']);
+        });
+
+        // Staff incentives (earnings + payouts)
+        Route::middleware('permission:manage_staff_incentives')->group(function () {
+            Route::resource('staff-incentive-earnings', StaffIncentiveEarningAPIController::class)->only(['index', 'show']);
+            Route::resource('staff-incentive-payouts', StaffIncentivePayoutAPIController::class)->only(['index', 'show', 'store']);
+        });
         // update user profile
         Route::get('edit-profile', [UserAPIController::class , 'editProfile'])->name('edit-profile');
         Route::post('update-profile', [UserAPIController::class , 'updateProfile'])->name('update-profile');

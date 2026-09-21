@@ -18,6 +18,9 @@ export const apiBaseURL = {
     CUSTOMERS: "/customers",
     CUSTOMER_WITHDRAWALS: "/customer-withdrawals",
     USERS: "/users",
+    STAFF: "/staff",
+    STAFF_INCENTIVE_EARNINGS: "/staff-incentive-earnings",
+    STAFF_INCENTIVE_PAYOUTS: "/staff-incentive-payouts",
     EXPENSES_CATEGORIES: "/expense-categories",
     EXPENSES: "/expenses",
     MAIN_PRODUCTS: "/main-products",
@@ -285,6 +288,23 @@ export const userActionType = {
     ADD_USER: "ADD_USER",
     EDIT_USER: "EDIT_USER",
     DELETE_USER: "DELETE_USER",
+};
+
+export const staffActionType = {
+    FETCH_STAFF: "FETCH_STAFF",
+    FETCH_STAFF_MEMBER: "FETCH_STAFF_MEMBER",
+    ADD_STAFF: "ADD_STAFF",
+    EDIT_STAFF: "EDIT_STAFF",
+    DELETE_STAFF: "DELETE_STAFF",
+};
+
+export const staffIncentiveEarningActionType = {
+    FETCH_STAFF_INCENTIVE_EARNINGS: "FETCH_STAFF_INCENTIVE_EARNINGS",
+};
+
+export const staffIncentivePayoutActionType = {
+    FETCH_STAFF_INCENTIVE_PAYOUTS: "FETCH_STAFF_INCENTIVE_PAYOUTS",
+    ADD_STAFF_INCENTIVE_PAYOUT: "ADD_STAFF_INCENTIVE_PAYOUT",
 };
 
 export const languageActionType = {
@@ -582,6 +602,8 @@ export const Permissions = {
     MANAGE_SUPPLIERS: "manage_suppliers",
     MANAGE_CUSTOMERS: "manage_customers",
     MANAGE_USER: "manage_users",
+    MANAGE_STAFF: "manage_staff",
+    MANAGE_STAFF_INCENTIVES: "manage_staff_incentives",
     MANAGE_EXPENSES_CATEGORIES: "manage_expense_categories",
     MANAGE_EXPENSES: "manage_expenses",
     MANAGE_SETTING: "manage_setting",

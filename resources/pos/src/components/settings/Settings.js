@@ -81,6 +81,7 @@ const Settings = (props) => {
         Currency_icon_Right_side: "",
         point_earning_rate: "",
         point_redemption_rate: "",
+        staff_commission_rate: "",
         show_stock_warning: "",
         font_size: 14,
     });
@@ -123,6 +124,7 @@ const Settings = (props) => {
         Currency_icon_Right_side: "",
         point_earning_rate: "",
         point_redemption_rate: "",
+        staff_commission_rate: "",
     });
 
     const [disable, setDisable] = React.useState(true);
@@ -341,6 +343,10 @@ const Settings = (props) => {
                     settings.attributes && settings.attributes.point_redemption_rate
                         ? settings.attributes.point_redemption_rate
                         : "",
+                staff_commission_rate:
+                    settings.attributes && settings.attributes.staff_commission_rate
+                        ? settings.attributes.staff_commission_rate
+                        : "1",
                 show_stock_warning:
                     settings.attributes &&
                         settings.attributes.show_stock_warning !== "1"
@@ -622,6 +628,7 @@ const Settings = (props) => {
         formData.append("is_currency_right", data.Currency_icon_Right_side);
         formData.append("point_earning_rate", data.point_earning_rate);
         formData.append("point_redemption_rate", data.point_redemption_rate);
+        formData.append("staff_commission_rate", data.staff_commission_rate);
         formData.append("font_size", data.font_size);
         formData.append(
             "show_stock_warning",
@@ -728,6 +735,8 @@ const Settings = (props) => {
             errorss["point_earning_rate"] = "Please enter point earning rate";
         } else if (!settingValue["point_redemption_rate"]) {
             errorss["point_redemption_rate"] = "Please enter point redemption rate";
+        } else if (!settingValue["staff_commission_rate"]) {
+            errorss["staff_commission_rate"] = "Please enter staff commission rate";
         }
         // else if (settingValue['postCode'].length > 8) {
         //     errorss['postCode'] = getFormattedMessage("settings.system-settings.select.postcode.validate.length.label");
@@ -879,6 +888,29 @@ const Settings = (props) => {
                                     {errors["point_redemption_rate"] ? (
                                         <span className="text-danger">
                                             {errors["point_redemption_rate"]}
+                                        </span>
+                                    ) : null}
+                                </div>
+                                <div className="col-lg-6 mb-3">
+                                    <label className="form-label">
+                                        {getFormattedMessage(
+                                            "settings.system-settings.input.staff-commission-rate.label"
+                                        )}
+                                        :
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="staff_commission_rate"
+                                        className="form-control"
+                                        placeholder={placeholderText(
+                                            "settings.system-settings.input.staff-commission-rate.placeholder.label"
+                                        )}
+                                        onChange={(e) => onChangeInput(e)}
+                                        value={settingValue.staff_commission_rate}
+                                    />
+                                    {errors["staff_commission_rate"] ? (
+                                        <span className="text-danger">
+                                            {errors["staff_commission_rate"]}
                                         </span>
                                     ) : null}
                                 </div>

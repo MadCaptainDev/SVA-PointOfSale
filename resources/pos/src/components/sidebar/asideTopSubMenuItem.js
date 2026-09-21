@@ -187,6 +187,13 @@ const AsideTopSubMenuItem = (props) => {
                                             mainItems?.subPath?.userSubPath
                                         ) ||
                                         location.pathname.includes(
+                                            mainItems?.subPath?.staffSubPath
+                                        ) ||
+                                        location.pathname.includes(
+                                            mainItems?.subPath
+                                                ?.staffIncentiveSubPath
+                                        ) ||
+                                        location.pathname.includes(
                                             mainItems?.subPath?.customerSubPath
                                         ) ||
                                         location.pathname.includes(

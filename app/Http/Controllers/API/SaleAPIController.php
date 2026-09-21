@@ -13,6 +13,7 @@ use App\Models\Sale;
 use App\Models\Setting;
 use App\Models\Warehouse;
 use App\Repositories\SaleRepository;
+use App\Repositories\StaffIncentiveEarningRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -134,6 +135,9 @@ class SaleAPIController extends AppBaseController
             if (File::exists(Storage::path('sales/barcode-' . $sale->reference_code . '.png'))) {
                 File::delete(Storage::path('sales/barcode-' . $sale->reference_code . '.png'));
             }
+            /** @var StaffIncentiveEarningRepository $incentiveRepo */
+            $incentiveRepo = app(StaffIncentiveEarningRepository::class);
+            $incentiveRepo->cancelForSale((int) $id);
             $this->saleRepository->delete($id);
             DB::commit();
 

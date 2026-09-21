@@ -273,12 +273,16 @@ export default [
             customerSubPath: "/app/customers",
             customerWithdrawalSubPath: "/app/customer-withdrawals",
             userSubPath: "/app/users",
+            staffSubPath: "/app/staff",
+            staffIncentiveSubPath: "/app/staff-incentives",
             suppliareSubPath: "/app/suppliers",
         },
         permission:
             Permissions.MANAGE_SUPPLIERS ||
             Permissions.MANAGE_CUSTOMERS ||
-            Permissions.MANAGE_USER,
+            Permissions.MANAGE_USER ||
+            Permissions.MANAGE_STAFF ||
+            Permissions.MANAGE_STAFF_INCENTIVES,
         subMenu: [
             {
                 title: "suppliers.title",
@@ -303,6 +307,22 @@ export default [
                 to: "/app/customer-withdrawals",
                 class: "d-flex",
                 permission: Permissions.MANAGE_CUSTOMERS,
+            },
+            {
+                title: "staff.title",
+                name: "staff",
+                fontIcon: <FontAwesomeIcon icon={faUser} />,
+                to: "/app/staff",
+                class: "d-flex",
+                permission: Permissions.MANAGE_STAFF,
+            },
+            {
+                title: "staff-incentives.title",
+                name: "staff incentives",
+                fontIcon: <FontAwesomeIcon icon={faMoneyBills} />,
+                to: "/app/staff-incentives",
+                class: "d-flex",
+                permission: Permissions.MANAGE_STAFF_INCENTIVES,
             },
             {
                 title: "users.title",

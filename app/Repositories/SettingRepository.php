@@ -70,7 +70,7 @@ class SettingRepository extends BaseRepository
                 'smtp_Encryption', 'address', 'show_version_on_footer', 'country', 'state', 'city', 'postcode',
                 'date_format', 'purchase_code', 'purchase_return_code', 'sale_code', 'sale_return_code', 'expense_code',
                 'is_currency_right', 'show_logo_in_receipt', 'show_app_name_in_sidebar',
-                'point_earning_rate', 'point_redemption_rate', 'show_stock_warning',
+                'point_earning_rate', 'point_redemption_rate', 'staff_commission_rate', 'show_stock_warning',
             ]);
 
             foreach ($settingInputArray as $key => $value) {

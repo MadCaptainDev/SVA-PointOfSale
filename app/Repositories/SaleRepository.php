@@ -238,6 +238,11 @@ class SaleRepository extends BaseRepository
 
             $customer->save();
 
+            /** @var StaffIncentiveEarningRepository $incentiveRepo */
+            $incentiveRepo = app(StaffIncentiveEarningRepository::class);
+            $sale->refresh();
+            $incentiveRepo->createForSale($sale);
+
             DB::commit();
 
             return $sale;

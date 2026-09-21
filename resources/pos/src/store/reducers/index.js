@@ -101,6 +101,9 @@ import variationReducer from "./variationReducer";
 import receiptSettingsReducer from "./receiptSettingsReducer";
 import customerWithdrawalReducer from "./customerWithdrawalReducer";
 import importLogReducer from "./importLogReducer";
+import staffReducer from "./staffReducer";
+import staffIncentiveEarningReducer from "./staffIncentiveEarningReducer";
+import staffIncentivePayoutReducer from "./staffIncentivePayoutReducer";
 
 export default combineReducers({
     loginUser: loginReducers,
@@ -116,6 +119,9 @@ export default combineReducers({
     units: unitsReducers,
     suppliers: supplierReducer,
     users: userReducers,
+    staff: staffReducer,
+    staffIncentiveEarnings: staffIncentiveEarningReducer,
+    staffIncentivePayouts: staffIncentivePayoutReducer,
     customers: customerReducer,
     expenseCategories: expenseCategoryReducer,
     expenses: expenseReducer,

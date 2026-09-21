@@ -19,6 +19,8 @@ const permissionMappings = {
     manage_suppliers: "/app/suppliers",
     manage_customers: "/app/customers",
     manage_users: "/app/users",
+    manage_staff: "/app/staff",
+    manage_staff_incentives: "/app/staff-incentives",
     manage_purchase: "/app/purchases",
     manage_pos_screen: "/app/pos",
     manage_sale: "/app/sales",
