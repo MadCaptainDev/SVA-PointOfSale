@@ -7,7 +7,6 @@ use App\Http\Requests\CreateStaffRequest;
 use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\StaffCollection;
 use App\Http\Resources\StaffResource;
-use App\Models\StaffProfile;
 use App\Repositories\StaffRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -53,8 +52,10 @@ class StaffAPIController extends AppBaseController
     /**
      * @return StaffResource|JsonResponse
      */
-    public function update(UpdateStaffRequest $request, StaffProfile $staff)
+    public function update(UpdateStaffRequest $request, $id)
     {
+        $staff = $this->staffRepository->find($id);
+
         if (Auth::id() == $staff->user_id) {
             return $this->sendError('You cannot update your own staff profile here.');
         }
@@ -65,8 +66,10 @@ class StaffAPIController extends AppBaseController
         return new StaffResource($staff);
     }
 
-    public function destroy(StaffProfile $staff): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $staff = $this->staffRepository->find($id);
+
         if (Auth::id() == $staff->user_id) {
             return $this->sendError('You cannot delete your own staff profile.');
         }

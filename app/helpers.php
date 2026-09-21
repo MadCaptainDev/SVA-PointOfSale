@@ -35,17 +35,26 @@ if (! function_exists('getSettingValue')) {
     {
         $key = 'setting'.'-'.$keyName;
 
-        static $settingValues;
+        if (! isset($GLOBALS['__infy_setting_values']) || ! is_array($GLOBALS['__infy_setting_values'])) {
+            $GLOBALS['__infy_setting_values'] = [];
+        }
 
-        if (isset($settingValues[$key])) {
-            return $settingValues[$key];
+        if (array_key_exists($key, $GLOBALS['__infy_setting_values'])) {
+            return $GLOBALS['__infy_setting_values'][$key];
         }
 
         /** @var Setting $setting */
         $setting = Setting::where('key', '=', $keyName)->first();
-        $settingValues[$key] = $setting->value;
+        $GLOBALS['__infy_setting_values'][$key] = $setting?->value;
 
-        return $setting->value;
+        return $GLOBALS['__infy_setting_values'][$key];
+    }
+}
+
+if (! function_exists('clearSettingValueCache')) {
+    function clearSettingValueCache(): void
+    {
+        $GLOBALS['__infy_setting_values'] = [];
     }
 }
 
