@@ -23,13 +23,40 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script_stop: true
           script: |
             set -e
-            cd ~/domains/pos.svasilksandreadymades.com/public_html
+
+            # Scope: this script only touches files tracked in git inside
+            # APP_DIR, plus Laravel caches and forward migrations.
+            # It never runs git reset/clean/checkout/stash, rm, migrate:fresh,
+            # migrate:rollback or db:seed, and never touches .env, uploads,
+            # storage/ or anything outside APP_DIR.
+            APP_DIR=~/domains/pos.svasilksandreadymades.com/public_html
+            cd "$APP_DIR"
+
+            # Refuse to run anywhere but this app's checkout.
+            case "$(git remote get-url origin)" in
+              *MadCaptainDev/SVA-PointOfSale*) ;;
+              *) echo "Refusing to deploy: $APP_DIR is not this repo's checkout"; exit 1 ;;
+            esac
+            if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
+              echo "Refusing to deploy: server checkout is not on main"; exit 1
+            fi
+
+            # Never overwrite edits made directly on the server.
+            if ! git diff --quiet || ! git diff --cached --quiet; then
+              echo "Refusing to deploy: tracked files were modified on the server:"
+              git status --short --untracked-files=no
+              exit 1
+            fi
+
+            git fetch origin main
+            echo "Files this deploy will change:"
+            git diff --stat HEAD origin/main
+
             php artisan down --retry=5
             trap 'php artisan up' EXIT
-            git pull --ff-only origin main
+            git merge --ff-only origin/main
             php artisan cache:clear
             php artisan config:clear
             php artisan route:clear
@@ -37,6 +64,4 @@ jobs:
             php artisan migrate --force
             php artisan optimize
             php artisan view:cache
-            # Hostinger disables PHP symlink(); uploads live in public/uploads anyway.
-            php artisan storage:link --force || true
             git log -1 --format="Deployed %h %s at $(date)"
