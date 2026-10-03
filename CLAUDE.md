@@ -6,6 +6,10 @@ Every push to `main` auto-deploys to the live POS server via `.github/workflows/
 (it can also be run manually from Actions → "Deploy to Live Server" → Run workflow).
 Treat a push to `main` as a production release.
 
+The workflow first builds the UI (`npx mix --production`) and commits the compiled
+`public/js` / `public/mix-manifest.json` to `main`, then the server fast-forward pulls.
+Don't hand-commit compiled assets; edit sources under `resources/` and let CI build.
+
 ## Scope rules (must follow)
 
 - Only change files that the current task asks for. Do not delete, rename, reformat or
