@@ -39,6 +39,7 @@ use App\Http\Controllers\API\UnitAPIController;
 use App\Http\Controllers\API\UserAPIController;
 use App\Http\Controllers\API\WarehouseAPIController;
 use App\Http\Controllers\API\VariationAPIController;
+use App\Http\Controllers\API\WidgetAPIController;
 use App\Http\Controllers\MailTemplateAPIController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ProductImportController;
@@ -53,30 +54,29 @@ use App\Http\Controllers\PurchaseExportController;
 
 
 
-Route::get('/export-purchase-units', [PurchaseExportController::class , 'exportUnits']);
+// Opened with window.open(), so the token comes from the SPA's authToken cookie.
+Route::middleware(['token.cookie', 'auth:sanctum'])->group(function () {
+    Route::get('/export-purchase-units', [PurchaseExportController::class , 'exportUnits']);
+    Route::get('/import-logs/{id}/error-report', 'App\Http\Controllers\API\ProductImportController@downloadErrorReport');
 
-Route::post('/products/import', 'App\Http\Controllers\API\ProductImportController@import');
-Route::get('/import-logs', 'App\Http\Controllers\API\ProductImportController@history');
-Route::get('/import-logs/{id}', 'App\Http\Controllers\API\ProductImportController@show');
-Route::get('/import-logs/{id}/error-report', 'App\Http\Controllers\API\ProductImportController@downloadErrorReport');
+    //reports
+    Route::middleware('permission:manage_reports')->group(function () {
+        Route::get('/purchase-report', [ReportController::class , 'purchaseReport']);
+        Route::get('/sales-report', [ReportController::class , 'salesReport']);
+        Route::get('/hsnSalesReport', [ReportController::class , 'hsnSalesReport']);
+        Route::get('/hsnPurchaseReport', [ReportController::class , 'hsnPurchaseReport']);
+        Route::get('/salesReturnReport', [ReportController::class , 'salesReturnReport']);
+        Route::get('/gstrSummaryReport', [ReportController::class , 'gstrSummaryReport']);
+        Route::get('/hsnSalesReturnReport', [ReportController::class , 'hsnSalesReturnReport']);
+        Route::get('/allReportsDownload', [ReportController::class , 'downloadAllReports']);
+    });
+});
 
-//reports
-Route::get('/purchase-report', [ReportController::class , 'purchaseReport']);
-Route::get('/sales-report', [ReportController::class , 'salesReport']);
-Route::get('/hsnSalesReport', [ReportController::class , 'hsnSalesReport']);
-Route::get('/hsnPurchaseReport', [ReportController::class , 'hsnPurchaseReport']);
-Route::get('/salesReturnReport', [ReportController::class , 'salesReturnReport']);
-Route::get('/gstrSummaryReport', [ReportController::class , 'gstrSummaryReport']);
-Route::get('/hsnSalesReturnReport', [ReportController::class , 'hsnSalesReturnReport']);
-
-
-Route::get('/allReportsDownload', [ReportController::class , 'downloadAllReports']);
-
-
-
-
-
-
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/products/import', 'App\Http\Controllers\API\ProductImportController@import');
+    Route::get('/import-logs', 'App\Http\Controllers\API\ProductImportController@history');
+    Route::get('/import-logs/{id}', 'App\Http\Controllers\API\ProductImportController@show');
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('permission:manage_brands')->group(function () {
@@ -98,6 +98,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('yearly-top-selling', [DashboardAPIController::class , 'getYearlyTopSelling']);
             Route::get('top-customers', [DashboardAPIController::class , 'getTopCustomer']);
             Route::get('stock-alerts', [DashboardAPIController::class , 'stockAlerts']);
+            Route::get('widget/daily-earnings', [WidgetAPIController::class , 'dailyEarnings']);
         }
         );
         // get all permission
@@ -468,7 +469,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('coupon-codes', CouponCodeAPIController::class);    });
 
 Route::post('login', [AuthController::class , 'login'])->name('login');
-Route::post('register', [AuthController::class , 'register']);
 
 Route::post(
     '/forgot-password',
