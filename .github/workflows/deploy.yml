@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: deploy-live
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -14,14 +18,18 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 217.21.94.123
-          port: 65002
-          username: u512425400
+          # Connection details live in repo secrets (this repo is public).
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
           script: |
+            set -e
             cd ~/domains/pos.svasilksandreadymades.com/public_html
-            git pull origin main
             php artisan down --retry=5
+            trap 'php artisan up' EXIT
+            git pull --ff-only origin main
             php artisan cache:clear
             php artisan config:clear
             php artisan route:clear
@@ -29,6 +37,6 @@ jobs:
             php artisan migrate --force
             php artisan optimize
             php artisan view:cache
-            php artisan storage:link --force
-            php artisan up
-            echo "Deployed at $(date)"
+            # Hostinger disables PHP symlink(); uploads live in public/uploads anyway.
+            php artisan storage:link --force || true
+            git log -1 --format="Deployed %h %s at $(date)"
