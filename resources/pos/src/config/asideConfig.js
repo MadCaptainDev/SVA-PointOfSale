@@ -196,6 +196,7 @@ export default [
         permission: Permissions.MANAGE_SALE,
         subPath: {
             salesSubPath: "/app/sales",
+            nonGstSalesSubPath: "/app/non-gst-sales",
             salesReturnSubPath: "/app/sale-return",
         },
         subMenu: [
@@ -204,6 +205,14 @@ export default [
                 name: "sales",
                 fontIcon: <FontAwesomeIcon icon={faCartShopping} />,
                 to: "/app/sales",
+                class: "d-flex",
+                permission: Permissions.MANAGE_SALE,
+            },
+            {
+                title: "non-gst-sales.title",
+                name: "non-gst sales",
+                fontIcon: <FontAwesomeIcon icon={faCartShopping} />,
+                to: "/app/non-gst-sales",
                 class: "d-flex",
                 permission: Permissions.MANAGE_SALE,
             },

@@ -81,6 +81,7 @@ export const apiBaseURL = {
     SMS_TEMPLATES_STATUS: "sms-template-status",
     EMAIL_TEMPLATES_STATUS: "mail-template-status",
     ALL_SALE_PURCHASE: "all-sales-purchases-count",
+    NON_GST_SALES_COUNT: "non-gst-sales-count",
     SUPPLIER_PURCHASE_REPORT: "supplier-purchases-report",
     SUPPLIER_PURCHASE_RETURN_REPORT: "supplier-purchases-return-report",
     SUPPLIER_PURCHASE_REPORT_EXCEL: "purchases-report-excel",

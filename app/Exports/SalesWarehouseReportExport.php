@@ -11,9 +11,9 @@ class SalesWarehouseReportExport implements FromView
     {
         $warehouseId = request()->get('warehouse_id');
         if (isset($warehouseId) && $warehouseId != 'null') {
-            $sales = Sale::whereWarehouseId($warehouseId)->with('warehouse', 'customer')->get();
+            $sales = Sale::gst()->whereWarehouseId($warehouseId)->with('warehouse', 'customer')->get();
         } else {
-            $sales = Sale::with('warehouse', 'customer')->get();
+            $sales = Sale::gst()->with('warehouse', 'customer')->get();
         }
 
         return view('excel.sale-report-excel', ['sales' => $sales]);

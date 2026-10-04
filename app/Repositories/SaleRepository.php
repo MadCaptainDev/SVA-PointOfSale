@@ -76,6 +76,11 @@ class SaleRepository extends BaseRepository
             $input['date'] = $input['date'] ?? date('Y/m/d');
             $input['is_sale_created'] = $input['is_sale_created'] ?? false;
             $QuotationId = $input['quotation_id'] ?? false;
+            $isGst = !isset($input['is_gst']) || filter_var($input['is_gst'], FILTER_VALIDATE_BOOLEAN);
+            $input['is_gst'] = $isGst;
+            if (!$isGst) {
+                $input = $this->withoutGst($input);
+            }
             $saleInputArray = Arr::only($input, [
                 'customer_id',
                 'tax_rate',
@@ -95,6 +100,7 @@ class SaleRepository extends BaseRepository
                 'redeem_points',
             ]);
             $saleInputArray['user_id'] = Auth::id();
+            $saleInputArray['is_gst'] = $isGst;
 
             /** @var Sale $sale */
             $sale = Sale::create($saleInputArray);
@@ -107,7 +113,7 @@ class SaleRepository extends BaseRepository
             }
 
             $sale = $this->storeSaleItems($sale, $input);
-            $reference_code = 'SVASM252600' . str_pad($sale->id, 4, '0', STR_PAD_LEFT);
+            $reference_code = $isGst ? 'SVASM252600' . str_pad($sale->id, 4, '0', STR_PAD_LEFT) : $sale->reference_code;
             $sale->reference_code = $reference_code;
 
             $this->generateBarcode($reference_code);
@@ -361,7 +367,9 @@ class SaleRepository extends BaseRepository
             $input['paid_amount'] = 0;
         }
 
-        $input['reference_code'] = getSettingValue('sale_code') . '_111' . $sale->id;
+        $input['reference_code'] = $sale->is_gst
+            ? getSettingValue('sale_code') . '_111' . $sale->id
+            : Sale::nextNonGstReference();
         $sale->update($input);
 
         return $sale;
@@ -375,6 +383,9 @@ class SaleRepository extends BaseRepository
         try {
             DB::beginTransaction();
             $sale = Sale::findOrFail($id);
+            if (!$sale->is_gst) {
+                $input = $this->withoutGst($input);
+            }
             $saleItemIds = SaleItem::whereSaleId($id)->pluck('id')->toArray();
             $saleItmOldIds = [];
             foreach ($input['sale_items'] as $key => $saleItem) {
@@ -468,6 +479,21 @@ class SaleRepository extends BaseRepository
             DB::rollBack();
             throw new UnprocessableEntityHttpException($e->getMessage());
         }
+    }
+
+    /**
+     * Non-GST bill: no order tax and no item tax.
+     */
+    public function withoutGst(array $input): array
+    {
+        $input['tax_rate'] = 0;
+        $input['tax_amount'] = 0;
+        foreach ($input['sale_items'] ?? [] as $key => $saleItem) {
+            $input['sale_items'][$key]['tax_value'] = 0;
+            $input['sale_items'][$key]['tax_amount'] = 0;
+        }
+
+        return $input;
     }
 
     public function updateItem($saleItem, $warehouseId): bool

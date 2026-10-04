@@ -27,11 +27,11 @@ class DashboardAPIController extends AppBaseController
         $data = [];
         $today = Carbon::today();
 
-        $data['today_sales'] = (float) Sale::where('date', $today)->sum('grand_total');
+        $data['today_sales'] = (float) Sale::gst()->where('date', $today)->sum('grand_total');
         $data['today_purchases'] = (float) Purchase::where('date', $today)->sum('grand_total');
-        $data['today_sale_return'] = (float) SaleReturn::where('date', $today)->sum('grand_total');
+        $data['today_sale_return'] = (float) $this->gstSaleReturns()->where('date', $today)->sum('grand_total');
         $data['today_purchase_return'] = (float) PurchaseReturn::where('date', $today)->sum('grand_total');
-        $data['today_sales_received_count'] = (float) SalesPayment::where('payment_date', $today)->sum('amount');
+        $data['today_sales_received_count'] = (float) $this->gstSalePayments()->where('payment_date', $today)->sum('amount');
         $data['today_expense_count'] = (float) Expense::where('date', $today)->sum('amount');
 
         return $this->sendResponse($data, 'Sales Purchase Count Retrieved Successfully');
@@ -41,19 +41,55 @@ class DashboardAPIController extends AppBaseController
     {
         $data = [];
 
-        $data['all_sales_count'] = (float) Sale::sum('grand_total');
-        $data['all_sale_return_count'] = (float) SaleReturn::sum('grand_total');
+        $data['all_sales_count'] = (float) Sale::gst()->sum('grand_total');
+        $data['all_sale_return_count'] = (float) $this->gstSaleReturns()->sum('grand_total');
         $data['all_purchase_return_count'] = (float) PurchaseReturn::sum('grand_total');
         $data['all_purchases_count'] = (float) Purchase::sum('grand_total') - $data['all_purchase_return_count'];
-        $data['all_sales_received_count'] = (float) SalesPayment::sum('amount');
+        $data['all_sales_received_count'] = (float) $this->gstSalePayments()->sum('amount');
         $data['all_expense_count'] = (float) Expense::sum('amount');
 
         return $this->sendResponse($data, 'All Sales Purchase and returns Count Retrieved Successfully');
     }
 
+    /**
+     * Non-GST sales totals, shown in their own dashboard row.
+     */
+    public function getNonGstSalesCounts(): JsonResponse
+    {
+        $today = Carbon::today();
+        $nonGstPayments = fn () => SalesPayment::whereHas('sale', fn ($q) => $q->nonGst());
+        $nonGstReturns = fn () => SaleReturn::whereHas('sale', fn ($q) => $q->nonGst());
+
+        $data = [
+            'all_sales' => (float) Sale::nonGst()->sum('grand_total'),
+            'today_sales' => (float) Sale::nonGst()->where('date', $today)->sum('grand_total'),
+            'all_received' => (float) $nonGstPayments()->sum('amount'),
+            'today_received' => (float) $nonGstPayments()->where('payment_date', $today)->sum('amount'),
+            'all_returns' => (float) $nonGstReturns()->sum('grand_total'),
+        ];
+
+        return $this->sendResponse($data, 'Non-GST Sales Count Retrieved Successfully');
+    }
+
+    /**
+     * Sale returns that belong to GST sales (or to no sale).
+     */
+    private function gstSaleReturns()
+    {
+        return SaleReturn::whereDoesntHave('sale', fn ($q) => $q->nonGst());
+    }
+
+    /**
+     * Payments received against GST sales.
+     */
+    private function gstSalePayments()
+    {
+        return SalesPayment::whereDoesntHave('sale', fn ($q) => $q->nonGst());
+    }
+
     public function getRecentSales(): SaleCollection
     {
-        $recentSales = Sale::latest()->take(5)->get();
+        $recentSales = Sale::gst()->latest()->take(5)->get();
         SaleResource::usingWithCollection();
 
         return new SaleCollection($recentSales);
@@ -90,7 +126,7 @@ class DashboardAPIController extends AppBaseController
             $days[] = $date->subDay()->format('Y-m-d');
         }
         $day['days'] = array_reverse($days);
-        $sales = Sale::whereBetween('date', [$day['days'][0], $day['days'][6]])
+        $sales = Sale::gst()->whereBetween('date', [$day['days'][0], $day['days'][6]])
             ->orderBy('date', 'desc')
             ->groupBy('date')
             ->get([

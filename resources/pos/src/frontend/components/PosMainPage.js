@@ -94,6 +94,8 @@ const PosMainPage = (props) => {
     const [selectedOption, setSelectedOption] = useState(null);
     const [updateHolList, setUpdateHoldList] = useState(false);
     const [hold_ref_no, setHold_ref_no] = useState("");
+    // GST bill (default) or Non-GST bill. Non-GST bills carry no item or order tax.
+    const [isGst, setIsGst] = useState(true);
     const [cartItemValue, setCartItemValue] = useState({
         discount_type: discountType.FIXED,
         discount_value: 0,
@@ -123,10 +125,15 @@ const PosMainPage = (props) => {
         return localCart.length > 0 ? localCart.reduce((a, b) => a + b, 0) : 0;
     }, [updateProducts]);
 
+    const cartProducts = React.useMemo(
+        () => (isGst ? updateProducts : updateProducts.map((u) => ({ ...u, tax_value: 0 }))),
+        [isGst, updateProducts]
+    );
+
     const subTotal = React.useMemo(() => {
-        const localTotal = updateProducts.map((u) => calculateProductCost(u).toFixed(2) * u.quantity);
+        const localTotal = cartProducts.map((u) => calculateProductCost(u).toFixed(2) * u.quantity);
         return localTotal.length > 0 ? localTotal.reduce((a, b) => a + b, 0) : 0;
-    }, [updateProducts]);
+    }, [cartProducts]);
 
     const [holdListId, setHoldListValue] = useState({ referenceNumber: "" });
 
@@ -271,7 +278,8 @@ const PosMainPage = (props) => {
 
     const updateCost = (item) => setNewCost(item);
     const openProductDetailModal = () => setIsOpenCartItemUpdateModel(!isOpenCartItemUpdateModel);
-    const onClickUpdateItemInCart = (item) => { setProduct(item); setIsOpenCartItemUpdateModel(true); };
+    // Edit the real cart item (not the Non-GST display copy) so changes are kept.
+    const onClickUpdateItemInCart = (item) => { setProduct(updateProducts.find((p) => p.id === item.id) || item); setIsOpenCartItemUpdateModel(true); };
     const onProductUpdateInCart = () => updateCart(updateProducts.slice());
     const updatedQty = (qty) => setQuantity(qty);
     const updateCart = (cartProducts) => setUpdateProducts(cartProducts);
@@ -280,7 +288,8 @@ const PosMainPage = (props) => {
     const customerModel = (val) => setModalShowCustomer(val);
 
     const preparePrintData = () => ({
-        products: updateProducts,
+        products: cartProducts,
+        is_gst: isGst,
         discount: cartItemValue.discount || 0,
         tax: cartItemValue.tax || 0,
         cartItemPrint: cartItemValue,
@@ -308,7 +317,8 @@ const PosMainPage = (props) => {
         point_discount: cartItemValue.point_discount,
         redeem_points: cartItemValue.redeem_points,
         shipping: cartItemValue.shipping,
-        tax_rate: cartItemValue.tax,
+        tax_rate: isGst ? cartItemValue.tax : 0,
+        is_gst: isGst,
         note: cashPaymentValue.notes,
         status: 1,
         hold_ref_no,
@@ -318,12 +328,13 @@ const PosMainPage = (props) => {
     const onCashPayment = (event, printSlip = false) => {
         event.preventDefault();
         if (handleValidation()) {
-            posCashPaymentAction(prepareData(updateProducts), setUpdateProducts, setModalShowPaymentSlip, posAllProduct, { brandId, categoryId, selectedOption }, printSlip);
+            posCashPaymentAction(prepareData(cartProducts), setUpdateProducts, setModalShowPaymentSlip, posAllProduct, { brandId, categoryId, selectedOption }, printSlip);
             setCashPayment(false);
             setPaymentPrint(preparePrintData());
             setCartItemValue({ discount_type: discountType.FIXED, discount_value: 0, discount: 0, tax: 0, shipping: 0, point_discount: 0, redeem_points: 0 });
             setCashPaymentValue({ notes: "", payment_status: { label: getFormattedMessage("dashboard.recentSales.paid.label"), value: 1 } });
             setCartProductIds("");
+            setIsGst(true);
         }
     };
 
@@ -471,8 +482,8 @@ const PosMainPage = (props) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {updateProducts && updateProducts.length ? (
-                                            updateProducts.map((updateProduct, index) => (
+                                        {cartProducts && cartProducts.length ? (
+                                            cartProducts.map((updateProduct, index) => (
                                                 <ProductCartList
                                                     singleProduct={updateProduct}
                                                     key={index + 1}
@@ -540,6 +551,31 @@ const PosMainPage = (props) => {
                     <div className="col-lg-4 pos-right-scs">
                         <div className="card-modern">
                             <div className="card-title-label">Order Summary</div>
+
+                            {/* Bill type: GST or Non-GST */}
+                            <div className="mb-3 bill-type-toggle" style={{ display: "flex", gap: "8px" }}>
+                                <button
+                                    type="button"
+                                    className={`btn-modern ${isGst ? "btn-primary-m" : "btn-ghost"}`}
+                                    style={{ flex: 1 }}
+                                    onClick={() => setIsGst(true)}
+                                >
+                                    {getFormattedMessage("pos.bill-type.gst")}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`btn-modern ${!isGst ? "btn-warning-m" : "btn-ghost"}`}
+                                    style={{ flex: 1 }}
+                                    onClick={() => setIsGst(false)}
+                                >
+                                    {getFormattedMessage("pos.bill-type.non-gst")}
+                                </button>
+                            </div>
+                            {!isGst && (
+                                <div className="alert alert-warning py-2 mb-3" style={{ fontSize: "13px" }}>
+                                    {getFormattedMessage("pos.bill-type.non-gst.notice")}
+                                </div>
+                            )}
 
                             <CartItemMainCalculation
                                 totalQty={totalQty}

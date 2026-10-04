@@ -39,6 +39,7 @@ class PrintData extends React.PureComponent {
       });
     }
 
+    const isNonGst = paymentPrint.is_gst === false;
     const totalTaxValue = (Number(paymentPrint.taxTotal) || 0) + inclusiveTaxTotal;
     const cgst = (totalTaxValue / 2).toFixed(2);
     const sgst = (totalTaxValue / 2).toFixed(2);
@@ -65,14 +66,16 @@ class PrintData extends React.PureComponent {
           {paymentPrint.frontSetting &&
             paymentPrint.frontSetting.value.address}
         </p>
-        <p className="text-align" aria-label="GSTIN">
-          <strong>GSTIN:</strong> 33BTHPM9608K1ZA
-        </p>
+        {!isNonGst && (
+          <p className="text-align" aria-label="GSTIN">
+            <strong>GSTIN:</strong> 33BTHPM9608K1ZA
+          </p>
+        )}
         <p className="text-align" aria-label="FSSAI">
           <strong>FSSAI:</strong> 12423028000042
         </p>
 
-        <h2 className="payment-mode" aria-label="Payment Mode">CASH BILL</h2>
+        <h2 className="payment-mode" aria-label="Payment Mode">{isNonGst ? "NON-GST BILL" : "CASH BILL"}</h2>
 
         <section className="section" aria-label="Invoice Details">
           <div>
@@ -151,9 +154,13 @@ class PrintData extends React.PureComponent {
         </table>
 
         <div className="tax-summary" aria-label="Tax Summary">
-          <p><strong>Tax Breakdown:</strong></p>
-          <p><span>CGST:</span><span>{currencySymbolHandling(allConfigData, currency, cgst || "0.00")}</span></p>
-          <p><span>SGST:</span><span>{currencySymbolHandling(allConfigData, currency, sgst || "0.00")}</span></p>
+          {!isNonGst && (
+            <>
+              <p><strong>Tax Breakdown:</strong></p>
+              <p><span>CGST:</span><span>{currencySymbolHandling(allConfigData, currency, cgst || "0.00")}</span></p>
+              <p><span>SGST:</span><span>{currencySymbolHandling(allConfigData, currency, sgst || "0.00")}</span></p>
+            </>
+          )}
           <p><span>Subtotal:</span><span> {currencySymbolHandling(
             allConfigData,
             currency,

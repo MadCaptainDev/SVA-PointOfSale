@@ -353,6 +353,11 @@ export const route = [
         permission: Permissions.MANAGE_SALE,
     },
     {
+        path: "non-gst-sales",
+        ele: <Sales nonGst key="non-gst-sales" />,
+        permission: Permissions.MANAGE_SALE,
+    },
+    {
         path: "sales/create",
         ele: <CreateSale />,
         permission: Permissions.MANAGE_SALE,

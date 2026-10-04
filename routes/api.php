@@ -92,6 +92,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('permission:manage_dashboard')->group(function () {
             Route::get('today-sales-purchases-count', [DashboardAPIController::class , 'getPurchaseSalesCounts']);
             Route::get('all-sales-purchases-count', [DashboardAPIController::class , 'getAllPurchaseSalesCounts']);
+            Route::get('non-gst-sales-count', [DashboardAPIController::class , 'getNonGstSalesCounts']);
             Route::get('recent-sales', [DashboardAPIController::class , 'getRecentSales']);
             Route::get('top-selling-products', [DashboardAPIController::class , 'getTopSellingProducts']);
             Route::get('week-selling-purchases', [DashboardAPIController::class , 'getWeekSalePurchases']);
