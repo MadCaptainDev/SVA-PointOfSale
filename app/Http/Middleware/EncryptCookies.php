@@ -12,6 +12,8 @@ class EncryptCookies extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        // Set in plain text by the POS app (js-cookie); TokenFromCookie reads it
+        // for window.open() downloads such as purchase barcode printing.
+        'authToken',
     ];
 }
