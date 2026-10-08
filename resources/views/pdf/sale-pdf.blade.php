@@ -56,6 +56,9 @@
         </td>
         <td align="center" style="vertical-align: bottom">
             <h2 style="color: dodgerblue;">{{ $sale->reference_code }}</h2>
+            @if(!$sale->is_gst)
+                <div style="font-weight: bold;">Non-GST Bill</div>
+            @endif
         </td>
 
         <td width="35%" style="line-height: 1; vertical-align: top;">

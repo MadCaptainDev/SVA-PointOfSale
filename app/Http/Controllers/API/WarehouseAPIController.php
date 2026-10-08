@@ -102,12 +102,12 @@ class WarehouseAPIController extends AppBaseController
     {
         $report = [];
         if ($request->get('warehouse_id') && ! empty($request->get('warehouse_id')) && $request->get('warehouse_id') != 'null') {
-            $report['sale_count'] = Sale::whereWarehouseId($request->get('warehouse_id'))->count();
+            $report['sale_count'] = Sale::gst()->whereWarehouseId($request->get('warehouse_id'))->count();
             $report['purchase_count'] = Purchase::whereWarehouseId($request->get('warehouse_id'))->count();
             $report['sale_return_count'] = SaleReturn::whereWarehouseId($request->get('warehouse_id'))->count();
             $report['purchase_return_count'] = PurchaseReturn::whereWarehouseId($request->get('warehouse_id'))->count();
         } else {
-            $report['sale_count'] = Sale::count();
+            $report['sale_count'] = Sale::gst()->count();
             $report['purchase_count'] = Purchase::count();
             $report['sale_return_count'] = SaleReturn::count();
             $report['purchase_return_count'] = PurchaseReturn::count();

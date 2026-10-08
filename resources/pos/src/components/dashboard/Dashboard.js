@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import MasterLayout from '../MasterLayout';
 import TabTitle from '../../shared/tab-title/TabTitle';
 import TodaySalePurchaseCount from './TodaySalePurchaseCount';
+import NonGstSalesCount from './NonGstSalesCount';
 import RecentSale from './RecentSale';
 import TopSellingProduct from './TopSellingProduct';
 import { placeholderText } from '../../shared/sharedMethod';
@@ -18,6 +19,7 @@ const Dashboard = () => {
             <TopProgressBar />
             <TabTitle title={placeholderText( 'dashboard.title' )} />
             <TodaySalePurchaseCount frontSetting={frontSetting} />
+            <NonGstSalesCount frontSetting={frontSetting} />
             <ThisWeekSalePurchaseChart frontSetting={frontSetting} />
             <TopSellingProduct frontSetting={frontSetting} />
             <RecentSale frontSetting={frontSetting} />

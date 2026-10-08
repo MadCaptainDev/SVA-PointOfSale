@@ -45,6 +45,9 @@ class SaleAPIController extends AppBaseController
         $warehouse = (Warehouse::where('name', 'LIKE', "%$search%")->get()->count() != 0);
 
         $sales = $this->saleRepository;
+        // Sales list shows GST sales; the Non-GST Sales list passes non_gst=1.
+        $isGst = !$request->boolean('non_gst');
+        $sales->scopeQuery(fn ($query) => $query->where('is_gst', $isGst));
         if ($customer || $warehouse) {
             $sales->whereHas('customer', function (Builder $q) use ($search, $customer) {
                 if ($customer) {
@@ -186,6 +189,7 @@ class SaleAPIController extends AppBaseController
     {
         $perPage = getPageSize($request);
         $productId = $request->get('product_id');
+        $this->saleRepository->scopeQuery(fn ($query) => $query->where('is_gst', true));
         $sales = $this->saleRepository->whereHas('saleItems', function ($q) use ($productId) {
             $q->where('product_id', '=', $productId);
         })->with(['saleItems.product', 'customer']);

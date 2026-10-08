@@ -33,6 +33,7 @@ const Sales = (props) => {
         frontSetting,
         isCallSaleApi,
         allConfigData,
+        nonGst = false,
     } = props;
     const [deleteModel, setDeleteModel] = useState(false);
     const [isShowPaymentModel, setIsShowPaymentModel] = useState(false);
@@ -51,7 +52,7 @@ const Sales = (props) => {
         frontSetting.value.currency_symbol;
 
     const onChange = (filter) => {
-        fetchSales(filter, true);
+        fetchSales(filter, true, nonGst);
     };
 
     //sale edit function
@@ -412,13 +413,13 @@ const Sales = (props) => {
     return (
         <MasterLayout>
             <TopProgressBar />
-            <TabTitle title={placeholderText("sales.title")} />
+            <TabTitle title={placeholderText(nonGst ? "non-gst-sales.title" : "sales.title")} />
             <div className="sale_table">
                 <ReactDataTable
                     columns={columns}
                     items={tableArray}
-                    to="#/app/sales/create"
-                    ButtonValue={getFormattedMessage("sale.create.title")}
+                    to={nonGst ? "#/app/pos" : "#/app/sales/create"}
+                    ButtonValue={getFormattedMessage(nonGst ? "non-gst-sales.create.title" : "sale.create.title")}
                     isShowPaymentModel={isShowPaymentModel}
                     isCallSaleApi={isCallSaleApi}
                     isShowDateRangeField

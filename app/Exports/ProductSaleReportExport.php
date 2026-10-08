@@ -11,7 +11,7 @@ class ProductSaleReportExport implements FromView
     {
         $productId = request()->get('product_id');
 
-        $sales = Sale::whereHas('saleItems', function ($q) use ($productId) {
+        $sales = Sale::gst()->whereHas('saleItems', function ($q) use ($productId) {
             $q->where('product_id', '=', $productId);
         })->with(['saleItems.product', 'customer'])->get();
 

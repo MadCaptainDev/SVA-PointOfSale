@@ -13,7 +13,7 @@ import { callSaleApi } from "./saleApiAction";
 import { setSavingButton } from "./saveButtonAction";
 
 export const fetchSales =
-    (filter = {}, isLoading = true) =>
+    (filter = {}, isLoading = true, nonGst = false) =>
     async (dispatch) => {
         if (isLoading) {
             dispatch(setLoading(true));
@@ -30,6 +30,9 @@ export const fetchSales =
                 filter.customer_id)
         ) {
             url += requestParam(filter, admin, null, null, url);
+        }
+        if (nonGst) {
+            url += (url.includes("?") ? "&" : "?") + "non_gst=1";
         }
         await apiConfig
             .get(url)

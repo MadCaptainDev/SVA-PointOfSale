@@ -12,12 +12,12 @@ class SaleReportExport implements FromView
         $startDate = request()->get('start_date');
         $endDate = request()->get('end_date');
         if ($startDate != 'null' && $endDate != 'null' && $startDate && $endDate) {
-            $sales = Sale::with(['saleItems', 'warehouse', 'customer', 'payments'])->whereDate('created_at', '>=',
+            $sales = Sale::gst()->with(['saleItems', 'warehouse', 'customer', 'payments'])->whereDate('created_at', '>=',
                 $startDate)
                 ->whereDate('created_at', '<=', $endDate)
                 ->get();
         } else {
-            $sales = Sale::with(['saleItems', 'warehouse', 'customer', 'payments'])->get();
+            $sales = Sale::gst()->with(['saleItems', 'warehouse', 'customer', 'payments'])->get();
         }
 
         return view('excel.all-sale-report-excel', ['sales' => $sales]);

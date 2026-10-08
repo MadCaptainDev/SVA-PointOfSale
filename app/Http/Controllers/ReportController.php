@@ -83,7 +83,7 @@ public function hsnSalesReturnReport(Request $request)
         FROM sale_return_items sri
         JOIN sales_return sr ON sri.sale_return_id = sr.id
         JOIN products p ON sri.product_id = p.id
-        WHERE sr.date BETWEEN ? AND ?
+        WHERE sr.date BETWEEN ? AND ? AND NOT EXISTS (SELECT 1 FROM sales ngs WHERE ngs.id = sr.sale_id AND ngs.is_gst = 0)
         GROUP BY p.hsn_code, p.name, sri.tax_value
         ORDER BY p.hsn_code ASC, p.name ASC
     ", [$startDate, $endDate]);
@@ -222,7 +222,7 @@ public function hsnSalesReturnReport(Request $request)
             sub_total
         FROM sale_items
     ) items ON items.sale_id = s.id
-    WHERE s.date BETWEEN ? AND ?
+    WHERE s.date BETWEEN ? AND ? AND s.is_gst = 1
     GROUP BY c.name, s.reference_code, DATE(s.date), items.tax_rate
     ORDER BY s.reference_code ASC, s.date ASC
 ", [$startDate, $endDate]);
@@ -308,7 +308,7 @@ public function salesReturnReport(Request $request)
             FROM sale_return_items items
             JOIN sales_return sr ON items.sale_return_id = sr.id
             JOIN customers c ON sr.customer_id = c.id
-            WHERE sr.date BETWEEN ? AND ?
+            WHERE sr.date BETWEEN ? AND ? AND NOT EXISTS (SELECT 1 FROM sales ngs WHERE ngs.id = sr.sale_id AND ngs.is_gst = 0)
             GROUP BY c.name, sr.reference_code, DATE(sr.date), items.tax_value
             ORDER BY sr.date ASC
         ) AS t
@@ -340,7 +340,7 @@ public function hsnSalesReport(Request $request)
         FROM sale_items si
         JOIN sales s ON si.sale_id = s.id
         JOIN products p ON si.product_id = p.id
-        WHERE s.date BETWEEN ? AND ?
+        WHERE s.date BETWEEN ? AND ? AND s.is_gst = 1
         GROUP BY p.hsn_code, p.name, si.tax_value
         ORDER BY p.hsn_code ASC, p.name ASC
     ", [$startDate, $endDate]);
@@ -464,7 +464,7 @@ public function gstrSummaryReport(Request $request)
                    items.tax_value AS tax_rate
             FROM sale_items items
             JOIN sales s ON items.sale_id = s.id
-            WHERE s.date BETWEEN ? AND ?
+            WHERE s.date BETWEEN ? AND ? AND s.is_gst = 1
         ) sales
 
         UNION ALL
@@ -483,7 +483,7 @@ public function gstrSummaryReport(Request $request)
                    items.tax_value AS tax_rate
             FROM sale_return_items items
             JOIN sales_return sr ON items.sale_return_id = sr.id
-            WHERE sr.date BETWEEN ? AND ?
+            WHERE sr.date BETWEEN ? AND ? AND NOT EXISTS (SELECT 1 FROM sales ngs WHERE ngs.id = sr.sale_id AND ngs.is_gst = 0)
         ) sales_return
 
         UNION ALL

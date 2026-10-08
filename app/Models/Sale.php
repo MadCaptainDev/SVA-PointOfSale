@@ -113,6 +113,7 @@ class Sale extends BaseModel implements HasMedia, JsonResourceful
         'reference_code',
         'barcode_symbol',
         'is_return',
+        'is_gst',
         'user_id',
         'point_discount',
         'redeem_points',
@@ -134,6 +135,7 @@ class Sale extends BaseModel implements HasMedia, JsonResourceful
         'status' => 'integer|required',
         'payment_status' => 'integer|required',
         'reference_code' => 'nullable',
+        'is_gst' => 'nullable|boolean',
     ];
 
     public $casts = [
@@ -150,6 +152,7 @@ class Sale extends BaseModel implements HasMedia, JsonResourceful
         'payment_type' => 'integer',
         'point_discount' => 'double',
         'redeem_points' => 'double',
+        'is_gst' => 'boolean',
     ];
 
     //tax type  const
@@ -185,6 +188,40 @@ class Sale extends BaseModel implements HasMedia, JsonResourceful
 
     const PARTIAL_PAID = 3;
 
+    // Reference prefix for Non-GST bills (own number series: NG_0001, NG_0002, ...)
+    const NON_GST_PREFIX = 'NG_';
+
+    /**
+     * Sales billed with GST. Use this wherever GST sales are listed, totalled or reported.
+     */
+    public function scopeGst($query)
+    {
+        return $query->where($this->getTable() . '.is_gst', true);
+    }
+
+    /**
+     * Sales billed without GST (kept separate from GST sales).
+     */
+    public function scopeNonGst($query)
+    {
+        return $query->where($this->getTable() . '.is_gst', false);
+    }
+
+    /**
+     * Next reference code in the Non-GST series.
+     */
+    public static function nextNonGstReference(): string
+    {
+        $last = static::nonGst()
+            ->where('reference_code', 'LIKE', self::NON_GST_PREFIX . '%')
+            ->lockForUpdate()
+            ->orderByDesc('id')
+            ->value('reference_code');
+        $number = $last ? ((int) substr($last, strlen(self::NON_GST_PREFIX))) + 1 : 1;
+
+        return self::NON_GST_PREFIX . str_pad($number, 4, '0', STR_PAD_LEFT);
+    }
+
     public function prepareLinks(): array
     {
         return [
@@ -208,6 +245,7 @@ class Sale extends BaseModel implements HasMedia, JsonResourceful
         $fields = [
             'date' => $this->date,
             'is_return' => $this->is_return,
+            'is_gst' => $this->is_gst,
             'customer_id' => $this->customer_id,
             'customer_name' => $this->customer->name,
             'warehouse_id' => $this->warehouse_id,

@@ -229,6 +229,9 @@ const AsideTopSubMenuItem = (props) => {
                                             mainItems?.subPath?.salesSubPath
                                         ) ||
                                         location.pathname.includes(
+                                            mainItems?.subPath?.nonGstSalesSubPath
+                                        ) ||
+                                        location.pathname.includes(
                                             mainItems?.subPath
                                                 ?.salesReturnSubPath
                                         ) ||
