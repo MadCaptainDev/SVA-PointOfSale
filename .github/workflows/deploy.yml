@@ -86,9 +86,13 @@ jobs:
             echo "Server checkout: $(git rev-parse --abbrev-ref HEAD) @ $(git rev-parse --short HEAD)"
 
             # Never overwrite edits made directly on the server.
-            if ! git diff --quiet || ! git diff --cached --quiet; then
+            # public/uploads is app data (barcodes, reports) that the app itself
+            # changes, so it is not counted here; merge --ff-only below still
+            # refuses to overwrite any file changed on the server.
+            if ! git diff --quiet -- . ':(exclude)public/uploads' \
+              || ! git diff --cached --quiet -- . ':(exclude)public/uploads'; then
               echo "Refusing to deploy: tracked files were modified on the server:"
-              git status --short --untracked-files=no
+              git status --short --untracked-files=no -- . ':(exclude)public/uploads'
               exit 1
             fi
 
