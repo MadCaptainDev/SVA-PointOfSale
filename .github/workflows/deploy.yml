@@ -80,9 +80,10 @@ jobs:
               *MadCaptainDev/SVA-PointOfSale*) ;;
               *) echo "Refusing to deploy: $APP_DIR is not this repo's checkout"; exit 1 ;;
             esac
-            if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
-              echo "Refusing to deploy: server checkout is not on main"; exit 1
-            fi
+            # The server checkout is not on a branch named "main", so the branch
+            # name is not checked; instead the code must be an older version of
+            # main (checked after the fetch below).
+            echo "Server checkout: $(git rev-parse --abbrev-ref HEAD) @ $(git rev-parse --short HEAD)"
 
             # Never overwrite edits made directly on the server.
             if ! git diff --quiet || ! git diff --cached --quiet; then
@@ -92,6 +93,9 @@ jobs:
             fi
 
             git fetch origin main
+            if ! git merge-base --is-ancestor HEAD origin/main; then
+              echo "Refusing to deploy: server code is not an older version of main"; exit 1
+            fi
             echo "Files this deploy will change:"
             git diff --stat HEAD origin/main
 
